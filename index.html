@@ -7,17 +7,48 @@
 </head>
 <body>
   <h1>Meu Carro</h1>
+  <img id="carroImagem" src="img/CarroMoranguinho.jpg" alt="Imagem do Carro">
 
-  <img id="carroImagem" src="img/SedanPrataBonito.jpg" alt="Imagem do Carro">
-
-  <p>Modelo: <span id="carroModelo"></span></p>
-  <p>Cor: <span id="carroCor"></span></p>
+  <p>Modelo: Morango <span id="carroModelo"></span></p>
+  <p>Cor: Rosa <span id="carroCor"></span></p>
   <p>Velocidade: <span id="carroVelocidade">0</span> km/h</p>
   <p>Status: <span id="carroStatus">Desligado</span></p>
 
   <button id="ligarBtn">Ligar</button>
   <button id="desligarBtn">Desligar</button>
   <button id="acelerarBtn">Acelerar</button>
+  <button id="frearBtn">Frear</button>
+
+  <!-- Carro Esportivo -->
+  <h2>Carro Esportivo</h2>
+  <img id="carroEsportivoImagem" src="img/CarroEsportivo.jpg" alt="Imagem do Carro Esportivo" style="display: none;">
+  <p>Velocidade Esportiva: <span id="carroEsportivoVelocidade">0</span> km/h</p>
+  <p>Status Esportivo: <span id="carroEsportivoStatus">Desligado</span></p>
+  <button id="ligarEsportivoBtn">Ligar</button>
+  <button id="desligarEsportivoBtn">Desligar</button>
+  <button id="acelerarEsportivoBtn">Acelerar</button>
+  <button id="frearEsportivoBtn">Frear</button>
+  <button id="ativarTurboBtn">Ativar Turbo</button>
+  <p>Turbo: <span id="turboStatus">Desativado</span></p>
+
+
+  <!-- Caminhão -->
+  <h2>Caminhão</h2>
+  <img id="caminhaoImagem" src="img/Caminhão.jpg" alt="Imagem do Caminhão" style="display: none;">
+  <p>Velocidade Caminhão: <span id="caminhaoVelocidade">0</span> km/h</p>
+  <p>Status Caminhão: <span id="caminhaoStatus">Desligado</span></p>
+  <button id="ligarCaminhaoBtn">Ligar</button>
+  <button id="desligarCaminhaoBtn">Desligar</button>
+  <button id="acelerarCaminhaoBtn">Acelerar</button>
+  <button id="frearCaminhaoBtn">Frear</button>
+  <label for="capacidadeCarga">Capacidade de Carga:</label>
+  <input type="number" id="capacidadeCarga" value="1000">
+  <label for="quantidadeCarga">Quantidade para Carregar/Descarregar:</label>
+  <input type="number" id="quantidadeCarga" value="100">
+  <button id="carregarBtn">Carregar</button>
+  <button id="descarregarBtn">Descarregar</button>
+  <p>Carga: <span id="cargaAtual">0</span>/<span id="capacidadeCargaSpan">1000</span> kg</p>
+
 
   <script src="script.js"></script>
 </body>
