@@ -1,70 +1,97 @@
 <!DOCTYPE html>
 <html>
+
 <head>
-  <title>Meu Carro Virtual</title>
-  <link rel="stylesheet" href="style.css">
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap">
+    <title>Meu Carro Virtual</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap">
 </head>
+
 <body>
-  <h1>Meu Carro</h1>
-  <img id="carroImagem" src="img/CarroMoranguinho.jpg" alt="Imagem do Carro">
+    <audio id="somBuzina" src="mp3/buzina.mp3" preload="auto"></audio>
+    <audio id="somFreio" src="mp3/freio.mp3" preload="auto"></audio>
 
-  <p>Modelo: Morango <span id="carroModelo"></span></p>
-  <p>Cor: Rosa <span id="carroCor"></span></p>
-  <p>Velocidade: <span id="carroVelocidade">0</span> km/h</p>
-  <p>Status: <span id="carroStatus">Desligado</span></p>
+    <h1>Meu Carro</h1>
+    <img id="carroImagem" src="img/CarroMoranguinho.jpg" alt="Imagem do Carro">
+    <p>Modelo: Morango <span id="carroModelo"></span></p>
+    <p>Cor: Rosa <span id="carroCor"></span></p>
+    <p>Velocidade: <span id="carroVelocidade">0</span> km/h</p>
+    <div class="velocimetro">
+        <div class="velocimetro-barra" id="velocimetroMeuCarro"></div>
+    </div>
+    <p>Status: <span id="carroStatus" class="status-desligado">Desligado</span></p>
+    <button id="ligarBtn">Ligar</button>
+    <button id="desligarBtn">Desligar</button>
+    <button id="acelerarBtn">Acelerar</button>
+    <button id="frearBtn">Frear</button>
+    <button id="buzinarBtn">Buzinar</button>
 
-  <button id="ligarBtn">Ligar</button>
-  <button id="desligarBtn">Desligar</button>
-  <button id="acelerarBtn">Acelerar</button>
-  <button id="frearBtn">Frear</button>
+    <!-- Carro Esportivo -->
+    <h2>Carro Esportivo</h2>
+    <img id="carroEsportivoImagem" src="img/CarroEsportivo.jpg" alt="Imagem do Carro Esportivo" style="display: none;">
+    <p>Velocidade Esportiva: <span id="carroEsportivoVelocidade">0</span> km/h</p>
+    <div class="velocimetro">
+        <div class="velocimetro-barra" id="velocimetroCarroEsportivo"></div>
+    </div>
+    <p>Status Esportivo: <span id="carroEsportivoStatus" class="status-desligado">Desligado</span></p>
+    <button id="ligarEsportivoBtn">Ligar</button>
+    <button id="desligarEsportivoBtn">Desligar</button>
+    <button id="acelerarEsportivoBtn">Acelerar</button>
+    <button id="frearEsportivoBtn">Frear</button>
+    <button id="ativarTurboBtn">Ativar Turbo</button>
+    <button id="buzinarEsportivoBtn">Buzinar</button>
+    <p>Turbo: <span id="turboStatus">Desativado</span></p>
 
-  <!-- Carro Esportivo -->
-  <h2>Carro Esportivo</h2>
-  <img id="carroEsportivoImagem" src="img/CarroEsportivo.jpg" alt="Imagem do Carro Esportivo" style="display: none;">
-  <p>Velocidade Esportiva: <span id="carroEsportivoVelocidade">0</span> km/h</p>
-  <p>Status Esportivo: <span id="carroEsportivoStatus">Desligado</span></p>
-  <button id="ligarEsportivoBtn">Ligar</button>
-  <button id="desligarEsportivoBtn">Desligar</button>
-  <button id="acelerarEsportivoBtn">Acelerar</button>
-  <button id="frearEsportivoBtn">Frear</button>
-  <button id="ativarTurboBtn">Ativar Turbo</button>
-  <p>Turbo: <span id="turboStatus">Desativado</span></p>
+    <!-- Caminhão -->
+    <h2>Caminhão</h2>
+    <img id="caminhaoImagem" src="img/Caminhao.jpg" alt="Imagem do Caminhão" style="display: none;">
+    <p>Velocidade Caminhão: <span id="caminhaoVelocidade">0</span> km/h</p>
+    <div class="velocimetro">
+        <div class="velocimetro-barra" id="velocimetroCaminhao"></div>
+    </div>
+    <p>Status Caminhão: <span id="caminhaoStatus" class="status-desligado">Desligado</span></p>
+    <button id="ligarCaminhaoBtn">Ligar</button>
+    <button id="desligarCaminhaoBtn">Desligar</button>
+    <button id="acelerarCaminhaoBtn">Acelerar</button>
+    <button id="frearCaminhaoBtn">Frear</button>
+    <button id="buzinarCaminhaoBtn">Buzinar</button>
+    <label for="capacidadeCarga">Capacidade de Carga:</label>
+    <input type="number" id="capacidadeCarga" value="1000">
+    <label for="quantidadeCarga">Quantidade para Carregar/Descarregar:</label>
+    <input type="number" id="quantidadeCarga" value="100">
+    <button id="carregarBtn">Carregar</button>
+    <button id="descarregarBtn">Descarregar</button>
+    <p>Carga: <span id="cargaAtual">0</span>/<span id="capacidadeCargaSpan">1000</span> kg</p>
 
-  <!-- Caminhão -->
-  <h2>Caminhão</h2>
-  <img id="caminhaoImagem" src="img/Caminhão.jpg" alt="Imagem do Caminhão" style="display: none;">
-  <p>Velocidade Caminhão: <span id="caminhaoVelocidade">0</span> km/h</p>
-  <p>Status Caminhão: <span id="caminhaoStatus">Desligado</span></p>
-  <button id="ligarCaminhaoBtn">Ligar</button>
-  <button id="desligarCaminhaoBtn">Desligar</button>
-  <button id="acelerarCaminhaoBtn">Acelerar</button>
-  <button id="frearCaminhaoBtn">Frear</button>
-  <label for="capacidadeCarga">Capacidade de Carga:</label>
-  <input type="number" id="capacidadeCarga" value="1000">
-  <label for="quantidadeCarga">Quantidade para Carregar/Descarregar:</label>
-  <input type="number" id="quantidadeCarga" value="100">
-  <button id="carregarBtn">Carregar</button>
-  <button id="descarregarBtn">Descarregar</button>
-  <p>Carga: <span id="cargaAtual">0</span>/<span id="capacidadeCargaSpan">1000</span> kg</p>
+    <h2>Informações do Veículo</h2>
+    <div id="informacoesVeiculo">Clique em um botão para exibir as informações.</div>
+    <div id="mensagemErro" style="color: red; margin-top: 10px;"></div>
 
-  <h2>Informações do Veículo</h2>
-  <div id="informacoesVeiculo">Clique em um botão para exibir as informações.</div>
+    <button id="btnMeuCarro">Meu Carro</button>
+    <button id="btnCarroEsportivo">Carro Esportivo</button>
+    <button id="btnCaminhao">Caminhão</button>
 
-  <button id="btnMeuCarro">Meu Carro</button>
-  <button id="btnCarroEsportivo">Carro Esportivo</button>
-  <button id="btnCaminhao">Caminhão</button>
+    <h2>Ações</h2>
+    <button id="acaoLigarBtn">Ligar</button>
+    <button id="acaoDesligarBtn">Desligar</button>
+    <button id="acaoAcelerarBtn">Acelerar</button>
+    <button id="acaoFrearBtn">Frear</button>
+    <button id="acaoAtivarTurboBtn">Ativar Turbo</button>
+    <button id="acaoDesativarTurboBtn">Desativar Turbo</button>
+    <button id="acaoCarregarBtn">Carregar</button>
+    <button id="acaoDescarregarBtn">Descarregar</button>
 
-  <h2>Ações</h2>
-  <button id="acaoLigarBtn">Ligar</button>
-  <button id="acaoDesligarBtn">Desligar</button>
-  <button id="acaoAcelerarBtn">Acelerar</button>
-  <button id="acaoFrearBtn">Frear</button>
-  <button id="acaoAtivarTurboBtn">Ativar Turbo</button>
-  <button id="acaoDesativarTurboBtn">Desativar Turbo</button>
-  <button id="acaoCarregarBtn">Carregar</button>
-  <button id="acaoDescarregarBtn">Descarregar</button>
+    <h2>Controles de Volume</h2>
+    <label for="volumeBuzina">Buzina:</label>
+    <input type="range" id="volumeBuzina" min="0" max="1" step="0.1" value="1">
 
-  <script src="script.js"></script>
+    <label for="volumeAceleracao">Aceleração:</label>
+    <input type="range" id="volumeAceleracao" min="0" max="1" step="0.1" value="1">
+
+    <label for="volumeFreio">Freio:</label>
+    <input type="range" id="volumeFreio" min="0" max="1" step="0.1" value="1">
+
+    <script src="script.js"></script>
 </body>
+
 </html>

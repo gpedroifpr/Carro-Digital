@@ -1,234 +1,314 @@
 class Carro {
-  constructor(modelo, cor) {
-    this.modelo = modelo;
-    this.cor = cor;
-    this.velocidade = 0;
-    this.ligado = false;
-    this.somLigando = new Audio("mp3/ligando.mp3");
-    this.somAcelerando = new Audio("mp3/acelerando.mp3");
-    this.somAcelerando.loop = true;
-    this.somAcelerando.volume = 0;
-  }
-
-  ligar() {
-    if (!this.ligado) {
-      this.ligado = true;
-      this.velocidade = 0;
-      this.atualizarDisplay();
-      this.somLigando.play();
-      this.somAcelerando.volume = 0.1;
-      this.somAcelerando.play();
-      console.log("Carro ligado!");
-    } else {
-      console.log("O carro já está ligado.");
+    constructor(modelo, cor) {
+        this.modelo = modelo;
+        this.cor = cor;
+        this.velocidade = 0;
+        this.ligado = false;
+        this.somLigando = new Audio("mp3/ligando.mp3");
+        this.somAcelerando = new Audio("mp3/acelerando.mp3");
+        this.somAcelerando.loop = true;
+        this.somAcelerando.volume = 0;
+        this.somBuzina = new Audio("mp3/buzina.mp3");
+        this.somFreio = new Audio("mp3/freio.mp3");
     }
-  }
 
-  desligar() {
-    if (this.ligado) {
-      this.ligado = false;
-      this.velocidade = 0;
-      this.atualizarDisplay();
-      this.somAcelerando.pause();
-      this.somAcelerando.currentTime = 0;
-      this.somAcelerando.volume = 0;
-      console.log("Carro desligado!");
-    } else {
-      console.log("O carro já está desligado.");
+    ligar() {
+        if (this.ligado) {
+            this.exibirMensagem("O carro já está ligado.");
+            return;
+        }
+        this.ligado = true;
+        this.velocidade = 0;
+        this.atualizarDisplay();
+        this.somLigando.play();
+        this.somAcelerando.volume = 0.1;
+        this.somAcelerando.play();
+        console.log("Carro ligado!");
     }
-  }
 
-  acelerar(incremento) {
-    if (this.ligado) {
-      this.velocidade += incremento;
-      this.atualizarDisplay();
-
-      // Ajusta o volume do som de acordo com a velocidade
-      let volume = Math.min(this.velocidade / 100, 1);
-      this.somAcelerando.volume = volume;
-
-      console.log("Acelerando! Velocidade:", this.velocidade, "Volume:", volume);
-    } else {
-      console.log("O carro precisa estar ligado para acelerar.");
+    desligar() {
+        if (!this.ligado) {
+            this.exibirMensagem("O carro já está desligado.");
+            return;
+        }
+        this.ligado = false;
+        this.velocidade = 0;
+        this.atualizarDisplay();
+        this.somAcelerando.pause();
+        this.somAcelerando.currentTime = 0;
+        this.somAcelerando.volume = 0;
+        console.log("Carro desligado!");
     }
-  }
 
-  frear(decremento) {
-    this.velocidade = Math.max(0, this.velocidade - decremento);
-    this.atualizarDisplay();
-    console.log("Freando! Velocidade:", this.velocidade);
-  }
+    acelerar(incremento) {
+        if (!this.ligado) {
+            this.exibirMensagem("O carro precisa estar ligado para acelerar.");
+            return;
+        }
+        if (this.velocidade >= 200) { // Exemplo de velocidade máxima
+            this.exibirMensagem("O carro já está na velocidade máxima!");
+            return;
+        }
+        this.velocidade += incremento;
+        this.atualizarDisplay();
+        let volume = Math.min(this.velocidade / 100, 1);
+        this.somAcelerando.volume = volume;
+        console.log("Acelerando! Velocidade:", this.velocidade, "Volume:", volume);
+    }
 
-  exibirInformacoes() {
-    return `Modelo: ${this.modelo}, Cor: ${this.cor}, Status: ${this.ligado ? "Ligado" : "Desligado"}, Velocidade: ${this.velocidade} km/h`;
-  }
+    frear(decremento) {
+        if (this.velocidade === 0) {
+            this.exibirMensagem("O carro já está parado.");
+            return;
+        }
+        this.velocidade = Math.max(0, this.velocidade - decremento);
+        this.atualizarDisplay();
+        this.somFreio.play();
+        console.log("Freando! Velocidade:", this.velocidade);
+    }
 
-  // Método genérico para atualizar a tela. Precisa ser sobrescrito nas subclasses.
-  atualizarDisplay() {}
+    buzinar() {
+        this.somBuzina.play();
+    }
+
+    exibirInformacoes() {
+        return `Modelo: ${this.modelo}, Cor: ${this.cor}, Status: ${this.ligado ? "Ligado" : "Desligado"}, Velocidade: ${this.velocidade} km/h`;
+    }
+
+    atualizarDisplay() {
+        const statusElement = document.getElementById("carroStatus");
+        const velocimetroBarra = document.getElementById("velocimetroMeuCarro");
+        const velocidadeElement = document.getElementById("carroVelocidade");
+
+        if (statusElement) {
+            statusElement.classList.remove("status-ligado", "status-desligado");
+            statusElement.classList.add(this.ligado ? "status-ligado" : "status-desligado");
+            statusElement.textContent = this.ligado ? "Ligado" : "Desligado";
+        }
+
+        if (velocimetroBarra) {
+            velocimetroBarra.style.width = `${Math.min(this.velocidade, 100)}%`;
+        }
+
+        if (velocidadeElement) {
+            velocidadeElement.textContent = this.velocidade;
+        }
+    }
+
+    exibirMensagem(mensagem) {
+        document.getElementById("mensagemErro").textContent = mensagem;
+        setTimeout(() => {
+            document.getElementById("mensagemErro").textContent = "";
+        }, 3000);
+    }
 }
 
 class CarroEsportivo extends Carro {
-  constructor(modelo, cor) {
-    super(modelo, cor);
-    this.turboAtivado = false;
-    this.somTurbo = new Audio("mp3/turbo.mp3"); // Adicione um som de turbo
-  }
-
-  ativarTurbo() {
-    if (this.ligado) {
-      this.turboAtivado = true;
-      this.acelerar(50); // Aumenta a velocidade com o turbo
-      this.somTurbo.play();
-      this.atualizarDisplay();
-      console.log("Turbo ativado!");
-    } else {
-      console.log("O carro precisa estar ligado para ativar o turbo.");
+    constructor(modelo, cor) {
+        super(modelo, cor);
+        this.turboAtivado = false;
+        this.somTurbo = new Audio("mp3/turbo.mp3");
     }
-  }
 
-  desativarTurbo() {
-    this.turboAtivado = false;
-    this.atualizarDisplay();
-    console.log("Turbo desativado.");
-  }
+    ativarTurbo() {
+        if (!this.ligado) {
+            this.exibirMensagem("O carro precisa estar ligado para ativar o turbo.");
+            return;
+        }
+        if (this instanceof Caminhao) {
+            this.exibirMensagem("Caminhão não tem turbo.");
+            return;
+        }
+        this.turboAtivado = true;
+        this.acelerar(50);
+        this.somTurbo.play();
+        this.atualizarDisplay();
+        console.log("Turbo ativado!");
+    }
 
-  desligar() {
-    super.desligar(); // Chama o método desligar da classe pai
-    this.desativarTurbo(); // Desativa o turbo quando o carro é desligado
-  }
+    desativarTurbo() {
+        this.turboAtivado = false;
+        this.atualizarDisplay();
+        console.log("Turbo desativado.");
+    }
 
-  exibirInformacoes() {
-    return `${super.exibirInformacoes()}, Turbo: ${this.turboAtivado ? "Ativado" : "Desativado"}`;
-  }
+    desligar() {
+        super.desligar();
+        this.desativarTurbo();
+    }
 
-  atualizarDisplay() {
-    document.getElementById("carroEsportivoVelocidade").textContent = this.velocidade;
-    document.getElementById("carroEsportivoStatus").textContent = this.ligado ? "Ligado" : "Desligado";
-    document.getElementById("turboStatus").textContent = this.turboAtivado ? "Ativado" : "Desativado";
-  }
+    exibirInformacoes() {
+        return `${super.exibirInformacoes()}, Turbo: ${this.turboAtivado ? "Ativado" : "Desativado"}`;
+    }
+
+    atualizarDisplay() {
+        const statusElement = document.getElementById("carroEsportivoStatus");
+        const velocimetroBarra = document.getElementById("velocimetroCarroEsportivo");
+        const velocidadeElement = document.getElementById("carroEsportivoVelocidade");
+
+        if (velocidadeElement) {
+            velocidadeElement.textContent = this.velocidade;
+        }
+
+        if (statusElement) {
+            statusElement.classList.remove("status-ligado", "status-desligado");
+            statusElement.classList.add(this.ligado ? "status-ligado" : "status-desligado");
+            statusElement.textContent = this.ligado ? "Ligado" : "Desligado";
+        }
+
+        if (velocimetroBarra) {
+            velocimetroBarra.style.width = `${Math.min(this.velocidade, 100)}%`;
+        }
+        document.getElementById("turboStatus").textContent = this.turboAtivado ? "Ativado" : "Desativado";
+    }
 }
 
 class Caminhao extends Carro {
-  constructor(modelo, cor, capacidadeCarga) {
-    super(modelo, cor);
-    this.capacidadeCarga = capacidadeCarga;
-    this.cargaAtual = 0;
-  }
-
-  carregar(quantidade) {
-    if (this.cargaAtual + quantidade <= this.capacidadeCarga) {
-      this.cargaAtual += quantidade;
-      this.atualizarDisplay();
-      console.log(`Caminhão carregado com ${quantidade} kg. Carga atual: ${this.cargaAtual} kg.`);
-    } else {
-      console.log(`Não é possível carregar mais que ${this.capacidadeCarga} kg.`);
+    constructor(modelo, cor, capacidadeCarga) {
+        super(modelo, cor);
+        this.capacidadeCarga = capacidadeCarga;
+        this.cargaAtual = 0;
     }
-  }
 
-  descarregar(quantidade) {
-    if (this.cargaAtual - quantidade >= 0) {
-      this.cargaAtual -= quantidade;
-      this.atualizarDisplay();
-      console.log(`Caminhão descarregado com ${quantidade} kg. Carga atual: ${this.cargaAtual} kg.`);
-    } else {
-      console.log("Não é possível descarregar mais do que a carga atual.");
+    carregar(quantidade) {
+        if (this instanceof CarroEsportivo) {
+            this.exibirMensagem("Carro Esportivo não pode ser carregado.");
+            return;
+        }
+        if (this.cargaAtual + quantidade > this.capacidadeCarga) {
+            this.exibirMensagem(`Não é possível carregar mais que ${this.capacidadeCarga} kg.`);
+            return;
+        }
+        this.cargaAtual += quantidade;
+        this.atualizarDisplay();
+        console.log(`Caminhão carregado com ${quantidade} kg. Carga atual: ${this.cargaAtual} kg.`);
     }
-  }
 
-  frear(decremento) {
-    this.velocidade = Math.max(0, this.velocidade - decremento);
-    this.atualizarDisplay();
-    console.log("Freando! Velocidade:", this.velocidade);
-  }
+    descarregar(quantidade) {
+        if (this.cargaAtual - quantidade < 0) {
+            this.exibirMensagem("Não é possível descarregar mais do que a carga atual.");
+            return;
+        }
+        this.cargaAtual -= quantidade;
+        this.atualizarDisplay();
+        console.log(`Caminhão descarregado com ${quantidade} kg. Carga atual: ${this.cargaAtual} kg.`);
+    }
 
-  exibirInformacoes() {
-    return `${super.exibirInformacoes()}, Carga: ${this.cargaAtual}/${this.capacidadeCarga} kg`;
-  }
+    frear(decremento) {
+        if (this.velocidade === 0) {
+            this.exibirMensagem("O caminhão já está parado.");
+            return;
+        }
+        this.velocidade = Math.max(0, this.velocidade - decremento);
+        this.atualizarDisplay();
+        console.log("Freando! Velocidade:", this.velocidade);
+    }
 
-  atualizarDisplay() {
-    document.getElementById("caminhaoVelocidade").textContent = this.velocidade;
-    document.getElementById("caminhaoStatus").textContent = this.ligado ? "Ligado" : "Desligado";
-    document.getElementById("cargaAtual").textContent = this.cargaAtual;
-  }
+    exibirInformacoes() {
+        return `${super.exibirInformacoes()}, Carga: ${this.cargaAtual}/${this.capacidadeCarga} kg`;
+    }
+
+    atualizarDisplay() {
+        const statusElement = document.getElementById("caminhaoStatus");
+        const velocimetroBarra = document.getElementById("velocimetroCaminhao");
+        const velocidadeElement = document.getElementById("caminhaoVelocidade");
+
+        if (velocidadeElement) {
+            velocidadeElement.textContent = this.velocidade;
+        }
+
+        if (statusElement) {
+            statusElement.classList.remove("status-ligado", "status-desligado");
+            statusElement.classList.add(this.ligado ? "status-ligado" : "status-desligado");
+            statusElement.textContent = this.ligado ? "Ligado" : "Desligado";
+        }
+
+        if (velocimetroBarra) {
+            velocimetroBarra.style.width = `${Math.min(this.velocidade, 100)}%`;
+        }
+        document.getElementById("cargaAtual").textContent = this.cargaAtual;
+    }
 }
 
 class Garagem {
-  constructor() {
-    this.veiculos = [];
-    this.veiculoSelecionado = null;
-  }
-
-  adicionarVeiculo(veiculo) {
-    this.veiculos.push(veiculo);
-  }
-
-  selecionarVeiculo(veiculo) {
-    this.veiculoSelecionado = veiculo;
-    this.atualizarDisplay();
-  }
-
-  interagir(acao, quantidade) {
-    if (!this.veiculoSelecionado) {
-      console.log("Nenhum veículo selecionado.");
-      return;
+    constructor() {
+        this.veiculos = [];
+        this.veiculoSelecionado = null;
     }
 
-    switch (acao) {
-      case "ligar":
-        this.veiculoSelecionado.ligar();
-        break;
-      case "desligar":
-        this.veiculoSelecionado.desligar();
-        break;
-      case "acelerar":
-        this.veiculoSelecionado.acelerar(10);
-        break;
-      case "frear":
-        this.veiculoSelecionado.frear(10);
-        break;
-      case "ativarTurbo":
-        if (this.veiculoSelecionado instanceof CarroEsportivo) {
-          this.veiculoSelecionado.ativarTurbo();
-        } else {
-          console.log("Este veículo não tem turbo!");
-        }
-        break;
-      case "desativarTurbo":
-        if (this.veiculoSelecionado instanceof CarroEsportivo) {
-          this.veiculoSelecionado.desativarTurbo();
-        } else {
-          console.log("Este veículo não tem turbo!");
-        }
-        break;
-      case "carregar":
-        if (this.veiculoSelecionado instanceof Caminhao) {
-          this.veiculoSelecionado.carregar(quantidade);
-        } else {
-          console.log("Este veículo não pode ser carregado!");
-        }
-        break;
-      case "descarregar":
-        if (this.veiculoSelecionado instanceof Caminhao) {
-          this.veiculoSelecionado.descarregar(quantidade);
-        } else {
-          console.log("Este veículo não pode ser descarregado!");
-        }
-        break;
-      default:
-        console.log("Ação inválida!");
+    adicionarVeiculo(veiculo) {
+        this.veiculos.push(veiculo);
     }
 
-    this.atualizarDisplay();
-  }
-
-  atualizarDisplay() {
-    if (this.veiculoSelecionado) {
-      document.getElementById("informacoesVeiculo").textContent = this.veiculoSelecionado.exibirInformacoes();
-      this.veiculoSelecionado.atualizarDisplay(); // Chama o método específico do veículo para atualizar a tela
-    } else {
-      document.getElementById("informacoesVeiculo").textContent = "Clique em um botão para exibir as informações.";
+    selecionarVeiculo(veiculo) {
+        this.veiculoSelecionado = veiculo;
+        this.atualizarDisplay();
     }
-  }
+
+    interagir(acao, quantidade) {
+        if (!this.veiculoSelecionado) {
+            console.log("Nenhum veículo selecionado.");
+            return;
+        }
+
+        switch (acao) {
+            case "ligar":
+                this.veiculoSelecionado.ligar();
+                break;
+            case "desligar":
+                this.veiculoSelecionado.desligar();
+                break;
+            case "acelerar":
+                this.veiculoSelecionado.acelerar(10);
+                break;
+            case "frear":
+                this.veiculoSelecionado.frear(10);
+                break;
+            case "buzinar":
+                this.veiculoSelecionado.buzinar();
+                break;
+            case "ativarTurbo":
+                if (this.veiculoSelecionado instanceof CarroEsportivo) {
+                    this.veiculoSelecionado.ativarTurbo();
+                } else {
+                    this.exibirMensagem("Este veículo não tem turbo!");
+                }
+                break;
+            case "carregar":
+                if (this.veiculoSelecionado instanceof Caminhao) {
+                    this.veiculoSelecionado.carregar(quantidade);
+                } else {
+                    this.exibirMensagem("Este veículo não pode ser carregado!");
+                }
+                break;
+            case "descarregar":
+                if (this.veiculoSelecionado instanceof Caminhao) {
+                    this.veiculoSelecionado.descarregar(quantidade);
+                } else {
+                    this.exibirMensagem("Este veículo não pode ser descarregado!");
+                }
+                break;
+            default:
+                console.log("Ação inválida!");
+        }
+
+        this.atualizarDisplay();
+    }
+
+    atualizarDisplay() {
+        if (this.veiculoSelecionado) {
+            document.getElementById("informacoesVeiculo").textContent = this.veiculoSelecionado.exibirInformacoes();
+            this.veiculoSelecionado.atualizarDisplay();
+        } else {
+            document.getElementById("informacoesVeiculo").textContent = "Clique em um botão para exibir as informações.";
+        }
+    }
+        exibirMensagem(mensagem) {
+        document.getElementById("mensagemErro").textContent = mensagem;
+        setTimeout(() => {
+            document.getElementById("mensagemErro").textContent = "";
+        }, 3000);
+    }
 }
 
 // Instanciando os veículos
@@ -254,50 +334,50 @@ document.getElementById("capacidadeCargaSpan").textContent = caminhao.capacidade
 
 // Adicionando eventos aos botões de ação
 document.getElementById("acaoLigarBtn").addEventListener("click", function() {
-  garagem.interagir("ligar");
+    garagem.interagir("ligar");
 });
 
 document.getElementById("acaoDesligarBtn").addEventListener("click", function() {
-  garagem.interagir("desligar");
+    garagem.interagir("desligar");
 });
 
 document.getElementById("acaoAcelerarBtn").addEventListener("click", function() {
-  garagem.interagir("acelerar");
+    garagem.interagir("acelerar");
 });
 
 document.getElementById("acaoFrearBtn").addEventListener("click", function() {
-  garagem.interagir("frear");
+    garagem.interagir("frear");
 });
 
 document.getElementById("acaoAtivarTurboBtn").addEventListener("click", function() {
-  garagem.interagir("ativarTurbo");
+    garagem.interagir("ativarTurbo");
 });
 
 document.getElementById("acaoDesativarTurboBtn").addEventListener("click", function() {
-  garagem.interagir("desativarTurbo");
+    garagem.interagir("desativarTurbo");
 });
 
 document.getElementById("acaoCarregarBtn").addEventListener("click", function() {
-  const quantidadeCarga = parseInt(document.getElementById("quantidadeCarga").value);
-  garagem.interagir("carregar", quantidadeCarga);
+    const quantidadeCarga = parseInt(document.getElementById("quantidadeCarga").value);
+    garagem.interagir("carregar", quantidadeCarga);
 });
 
 document.getElementById("acaoDescarregarBtn").addEventListener("click", function() {
-  const quantidadeCarga = parseInt(document.getElementById("quantidadeCarga").value);
-  garagem.interagir("descarregar", quantidadeCarga);
+    const quantidadeCarga = parseInt(document.getElementById("quantidadeCarga").value);
+    garagem.interagir("descarregar", quantidadeCarga);
 });
 
 // Adicionando eventos aos botões de seleção de veículo
 document.getElementById("btnMeuCarro").addEventListener("click", function() {
-  garagem.selecionarVeiculo(meuCarro);
+    garagem.selecionarVeiculo(meuCarro);
 });
 
 document.getElementById("btnCarroEsportivo").addEventListener("click", function() {
-  garagem.selecionarVeiculo(carroEsportivo);
+    garagem.selecionarVeiculo(carroEsportivo);
 });
 
 document.getElementById("btnCaminhao").addEventListener("click", function() {
-  garagem.selecionarVeiculo(caminhao);
+    garagem.selecionarVeiculo(caminhao);
 });
 
 // Adicionando eventos aos botões do Carro Base
@@ -319,6 +399,11 @@ document.getElementById("acelerarBtn").addEventListener("click", function() {
 document.getElementById("frearBtn").addEventListener("click", function() {
     garagem.selecionarVeiculo(meuCarro);
     garagem.interagir("frear");
+});
+
+document.getElementById("buzinarBtn").addEventListener("click", function() {
+    garagem.selecionarVeiculo(meuCarro);
+    garagem.interagir("buzinar");
 });
 
 // Adicionando eventos aos botões do Carro Esportivo
@@ -347,6 +432,11 @@ document.getElementById("ativarTurboBtn").addEventListener("click", function() {
     garagem.interagir("ativarTurbo");
 });
 
+document.getElementById("buzinarEsportivoBtn").addEventListener("click", function() {
+    garagem.selecionarVeiculo(carroEsportivo);
+    garagem.interagir("buzinar");
+});
+
 // Adicionando eventos aos botões do Caminhão
 document.getElementById("ligarCaminhaoBtn").addEventListener("click", function() {
     garagem.selecionarVeiculo(caminhao);
@@ -364,8 +454,13 @@ document.getElementById("acelerarCaminhaoBtn").addEventListener("click", functio
 });
 
 document.getElementById("frearCaminhaoBtn").addEventListener("click", function() {
+        garagem.selecionarVeiculo(caminhao);
+        garagem.interagir("frear");
+    });
+
+document.getElementById("buzinarCaminhaoBtn").addEventListener("click", function() {
     garagem.selecionarVeiculo(caminhao);
-    garagem.interagir("frear");
+    garagem.interagir("buzinar");
 });
 
 document.getElementById("carregarBtn").addEventListener("click", function() {
@@ -378,4 +473,23 @@ document.getElementById("descarregarBtn").addEventListener("click", function() {
     garagem.selecionarVeiculo(caminhao);
     const quantidadeCarga = parseInt(document.getElementById("quantidadeCarga").value);
     garagem.interagir("descarregar", quantidadeCarga);
+});
+
+// Controles de Volume
+document.getElementById("volumeBuzina").addEventListener("input", function() {
+    meuCarro.somBuzina.volume = this.value;
+    carroEsportivo.somBuzina.volume = this.value;
+    caminhao.somBuzina.volume = this.value;
+});
+
+document.getElementById("volumeAceleracao").addEventListener("input", function() {
+    meuCarro.somAcelerando.volume = this.value;
+    carroEsportivo.somAcelerando.volume = this.value;
+    caminhao.somAcelerando.volume = this.value;
+});
+
+document.getElementById("volumeFreio").addEventListener("input", function() {
+    meuCarro.somFreio.volume = this.value;
+    carroEsportivo.somFreio.volume = this.value;
+    caminhao.somFreio.volume = this.value;
 });
