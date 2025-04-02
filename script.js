@@ -1,3 +1,57 @@
+// script.js (início do arquivo)
+
+class Manutencao {
+    constructor(data, tipo, custo, descricao = "") { // Descrição opcional
+        if (!this.validar(data, tipo, custo)) {
+            throw new Error("Dados de manutenção inválidos."); // Lança erro se inválido
+        }
+        this.data = new Date(data); // Armazena como objeto Date
+        this.tipo = tipo;
+        this.custo = parseFloat(custo);
+        this.descricao = descricao;
+    }
+
+    // Método para retornar uma string formatada
+    toString() {
+        // Formata a data para dd/mm/yyyy
+        const dataFormatada = this.data.toLocaleDateString('pt-BR', { timeZone: 'UTC' }); // Adiciona UTC para evitar problemas de fuso horário
+        return `${this.tipo} em ${dataFormatada} - R$ ${this.custo.toFixed(2)}${this.descricao ? ` (${this.descricao})` : ''}`;
+    }
+
+    // Método simples de validação
+    validar(data, tipo, custo) {
+        const dataObj = new Date(data);
+        // Verifica se a data é válida, tipo não está vazio e custo é número positivo
+        if (isNaN(dataObj.getTime()) || !tipo || typeof tipo !== 'string' || isNaN(parseFloat(custo)) || parseFloat(custo) < 0) {
+            console.error("Erro de validação:", { data, tipo, custo });
+            return false;
+        }
+        return true;
+    }
+
+    // Método para verificar se a manutenção é futura (agendamento)
+    isFutura() {
+        const hoje = new Date();
+        hoje.setHours(0, 0, 0, 0); // Zera a hora para comparar apenas a data
+        const dataManutencao = new Date(this.data); // Garante que é um objeto Date
+        dataManutencao.setHours(0,0,0,0); // Zera a hora para comparar apenas a data
+        return dataManutencao >= hoje;
+    }
+
+     // Método para converter para um objeto simples (para salvar no LocalStorage)
+     toJSON() {
+        return {
+            data: this.data.toISOString(), // Salva data como string ISO 8601
+            tipo: this.tipo,
+            custo: this.custo,
+            descricao: this.descricao
+        };
+    }
+}
+
+// Restante das suas classes (Carro, CarroEsportivo, Caminhao, Garagem)...
+// ... (não cole o código restante aqui ainda)
+
 class Carro {
     constructor(modelo, cor) {
         this.modelo = modelo;
