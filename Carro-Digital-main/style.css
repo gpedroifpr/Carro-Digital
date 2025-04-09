@@ -1,0 +1,550 @@
+/* Estilos Globais e Reset Básico */
+* {
+  box-sizing: border-box; /* Inclui padding e border na largura/altura total */
+}
+
+body {
+  font-family: 'Roboto', sans-serif;
+  background-color: #f4f7f6; /* Cor de fundo suave */
+  color: #333;
+  margin: 0;
+  padding: 0;
+  line-height: 1.6;
+}
+
+/* Títulos */
+h1, h2 {
+  color: #0d47a1; /* Azul mais escuro */
+  text-align: center;
+  margin-top: 20px;
+  margin-bottom: 15px;
+}
+h2 {
+  margin-top: 25px;
+  border-bottom: 1px solid #eee; /* Borda mais suave */
+  padding-bottom: 8px;
+  font-weight: 500; /* Peso um pouco menor que h1 */
+}
+h3 {
+  color: #1a237e; /* Azul índigo escuro */
+  margin-top: 15px;
+  margin-bottom: 10px;
+  font-size: 1.1em;
+  font-weight: 500;
+  text-align: left;
+}
+
+hr {
+  border: 0;
+  height: 1px;
+  background-color: #e0e0e0; /* Cinza mais claro */
+  margin: 25px 0;
+}
+
+/* Layout Principal */
+.container-principal {
+  display: flex;
+  flex-wrap: wrap; /* Permite quebrar linha em telas menores */
+  justify-content: space-around; /* Espaça as colunas */
+  padding: 20px;
+  gap: 25px; /* Espaço entre as colunas */
+}
+
+.coluna-controles,
+.coluna-manutencao {
+  background-color: #ffffff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.08); /* Sombra mais sutil */
+  flex: 1; /* Faz as colunas ocuparem espaço disponível */
+  min-width: 320px; /* Largura mínima para evitar espremer demais */
+  display: flex; /* Tornar coluna flexível */
+  flex-direction: column; /* Organizar conteúdo verticalmente */
+}
+
+/* Seleção de Veículos */
+#selecaoVeiculosContainer {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center; /* Centraliza os cards */
+  gap: 15px;
+  padding: 20px;
+  background-color: #e8f0fe; /* Fundo azul mais claro */
+  margin: 0 20px 20px 20px; /* Margem nas laterais */
+  border-radius: 8px;
+  border: 1px solid #cdd6f4; /* COR CORRIGIDA - Era #c_cd_d6 */
+}
+/* Mensagem quando não há veículos */
+#selecaoVeiculosContainer > p {
+  width: 100%;
+  text-align: center;
+  color: #555;
+  font-style: italic;
+}
+
+.veiculo-card {
+  background-color: #fff;
+  border: 1px solid #dae6dd; /* COR CORRIGIDA - Era #d_ae_dd */
+  border-radius: 8px;
+  padding: 12px;
+  text-align: center;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.07);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  width: 160px;
+  cursor: default;
+  display: flex;
+  flex-direction: column; /* Empilha imagem, texto e botões */
+  justify-content: space-between; /* Espaça conteúdo */
+}
+
+.veiculo-card img {
+  max-width: 100%;
+  height: 80px;
+  object-fit: contain;
+  border-radius: 4px;
+  margin-bottom: 8px;
+  border: 1px solid #eee;
+  align-self: center; /* Centraliza imagem */
+}
+
+.veiculo-card p {
+  margin: 0 0 5px 0; /* Margem apenas inferior */
+  font-size: 1em; /* Tamanho um pouco maior */
+  font-weight: 500;
+  color: #333;
+  word-wrap: break-word; /* Quebra palavras longas */
+}
+.veiculo-card span { /* Estilo para o tipo do veículo */
+  font-size: 0.8em;
+  color: #555;
+  margin-bottom: 10px; /* Espaço antes dos botões */
+  display: block; /* Garante quebra de linha */
+}
+
+.veiculo-card div { /* Container dos botões */
+  margin-top: auto; /* Empurra para baixo */
+}
+
+.veiculo-card button {
+  padding: 7px 12px;
+  font-size: 0.85em;
+  margin: 5px 3px 0 3px; /* Adiciona margem superior */
+  cursor: pointer;
+}
+
+.veiculo-card.selecionado {
+  border-color: #2962ff;
+  box-shadow: 0 5px 15px rgba(41, 98, 255, 0.25);
+  transform: translateY(-3px) scale(1.02); /* Efeito mais pronunciado */
+}
+
+.btn-selecionar-veiculo {
+  background-color: #2962ff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+}
+.btn-selecionar-veiculo:hover {
+  background-color: #1a4db8;
+}
+
+.btn-remover-veiculo {
+  background-color: #f44336; /* Vermelho */
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-weight: bold; /* Deixa o X mais visível */
+  padding: 7px 10px; /* Ajuste fino padding */
+}
+.btn-remover-veiculo:hover {
+  background-color: #d32f2f;
+}
+
+
+/* Informações e Controles do Veículo Selecionado */
+#informacoesVeiculo {
+  background-color: #f1f3f4; /* Cinza bem claro */
+  border-left: 5px solid #1976d2; /* Azul mais escuro */
+  padding: 12px 18px;
+  margin-bottom: 20px;
+  border-radius: 4px;
+  font-size: 0.95em;
+  line-height: 1.5;
+}
+#informacoesVeiculo strong {
+  color: #0d47a1;
+}
+#informacoesVeiculo .status-ligado { color: #388e3c; font-weight: bold; }
+#informacoesVeiculo .status-desligado { color: #d32f2f; font-weight: bold; }
+
+/* Display dinâmico (velocímetro, status, turbo, carga) */
+#displayVeiculoSelecionado {
+  border: 1px solid #e0e0e0;
+  padding: 15px;
+  margin-bottom: 20px;
+  border-radius: 5px;
+  background-color: #fafafa;
+}
+#displayVeiculoSelecionado p, #displayVeiculoSelecionado div {
+  margin-bottom: 8px; /* Espaçamento padrão */
+}
+#displayVeiculoSelecionado p:last-child, #displayVeiculoSelecionado div:last-child {
+  margin-bottom: 0; /* Remove margem do último elemento */
+}
+/* Estilos específicos para Turbo e Carga (quando visíveis) */
+#displayTurbo { font-weight: bold; }
+#displayCarga label { margin-right: 5px; font-size: 0.9em; }
+#displayCarga input[type="number"] {
+  width: 75px;
+  padding: 6px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+#displayCarga input[type="number"]:disabled {
+  background-color: #eee;
+  cursor: not-allowed;
+}
+
+
+/* Botões de Ação Gerais */
+.botoes-acao {
+  display: flex;
+  flex-wrap: wrap; /* Quebra linha se não couber */
+  gap: 8px; /* Espaço entre botões */
+  margin-bottom: 20px; /* Espaço antes do controle de volume */
+}
+.botoes-acao button {
+  padding: 10px 15px;
+  font-size: 14px;
+  cursor: pointer;
+  flex-grow: 1; /* Tenta ocupar espaço igual */
+  min-width: 100px; /* Largura mínima */
+  background-color: #1e88e5; /* Azul padrão */
+  color: white;
+  border: none;
+  border-radius: 5px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: background-color 0.2s ease, box-shadow 0.2s ease, opacity 0.3s ease;
+  font-weight: 500;
+}
+.botoes-acao button:hover:not(:disabled) {
+  background-color: #1565c0; /* Azul mais escuro no hover */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+/* Cores Específicas para alguns botões */
+#acaoLigarBtn { background-color: #4caf50; } /* Verde */
+#acaoLigarBtn:hover:not(:disabled) { background-color: #388e3c; }
+#acaoDesligarBtn { background-color: #f44336; } /* Vermelho */
+#acaoDesligarBtn:hover:not(:disabled) { background-color: #d32f2f; }
+#acaoAtivarTurboBtn { background-color: #ff9800; } /* Laranja */
+#acaoAtivarTurboBtn:hover:not(:disabled) { background-color: #f57c00; }
+#acaoDesativarTurboBtn { background-color: #ffb74d; } /* Laranja claro */
+#acaoDesativarTurboBtn:hover:not(:disabled) { background-color: #ffa726; }
+#acaoCarregarBtn { background-color: #8bc34a; } /* Verde claro */
+#acaoCarregarBtn:hover:not(:disabled) { background-color: #689f38; }
+#acaoDescarregarBtn { background-color: #ffeb3b; color: #424242; } /* Amarelo */
+#acaoDescarregarBtn:hover:not(:disabled) { background-color: #fdd835; }
+
+/* Estilo Comum para botões desabilitados */
+button:disabled {
+  background-color: #bdbdbd !important; /* Cinza claro, !important para sobrescrever cores específicas */
+  color: #757575 !important;
+  cursor: not-allowed;
+  opacity: 0.6;
+  box-shadow: none;
+}
+
+
+/* Estilos para Manutenção e Formulário */
+.coluna-manutencao {
+  flex-grow: 1.2; /* Dar um pouco mais de espaço para esta coluna se possível */
+}
+
+#formAgendamento fieldset {
+  border: 1px solid #ccc;
+  padding: 20px;
+  border-radius: 5px;
+  margin-bottom: 20px;
+  background-color: #fdfdfd;
+}
+#formAgendamento legend {
+  font-weight: bold;
+  color: #1a4db8;
+  padding: 0 10px;
+  font-size: 1.05em;
+}
+#formAgendamento div {
+  margin-bottom: 12px;
+}
+#formAgendamento label {
+  display: block;
+  margin-bottom: 4px;
+  font-weight: 500;
+  font-size: 0.9em;
+  color: #555;
+}
+#formAgendamento input[type="text"],
+#formAgendamento input[type="date"],
+#formAgendamento input[type="datetime-local"],
+#formAgendamento input[type="number"],
+#formAgendamento select,
+#formAgendamento textarea {
+  width: 100%; /* Ocupa toda a largura do container div */
+  padding: 9px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 1em;
+  background-color: #fff;
+}
+#formAgendamento input:focus,
+#formAgendamento select:focus,
+#formAgendamento textarea:focus {
+  border-color: #2962ff;
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(41, 98, 255, 0.2);
+}
+#formAgendamento textarea {
+  resize: vertical;
+  min-height: 40px;
+}
+#formAgendamento button[type="submit"] {
+   background-color: #00796b; /* Verde azulado (teal) */
+   display: block;
+   width: auto; /* Ajusta ao conteúdo */
+   padding: 10px 25px;
+   min-width: 150px;
+   margin-top: 10px;
+   color: white;
+   border: none;
+   border-radius: 4px;
+   cursor: pointer;
+   font-weight: 500;
+}
+#formAgendamento button[type="submit"]:hover {
+  background-color: #004d40;
+}
+#formAgendamento fieldset:disabled {
+  opacity: 0.7;
+  background-color: #f5f5f5;
+  pointer-events: none; /* Impede interação */
+}
+#formAgendamento fieldset:disabled legend {
+  color: #999;
+}
+
+
+/* Histórico e Agendamentos */
+#historicoManutencaoContainer,
+#agendamentosFuturosContainer {
+  margin-top: 20px;
+  flex-grow: 1; /* Permite que ocupem espaço restante na coluna */
+  display: flex; /* Organiza título e lista */
+  flex-direction: column;
+}
+
+#historicoManutencao, /* Div que contém a lista ou a mensagem */
+#agendamentosFuturos {
+  border: 1px solid #eee;
+  border-radius: 4px;
+  background-color: #fff;
+  flex-grow: 1; /* Ocupa espaço vertical */
+  overflow-y: auto; /* Adiciona scroll vertical se necessário */
+  max-height: 250px; /* Limita altura máxima */
+  min-height: 80px; /* Altura mínima para não sumir */
+}
+
+#historicoManutencao ul,
+#agendamentosFuturos ul {
+  list-style: none;
+  padding: 0;
+  margin: 0; /* Remove margem padrão da UL */
+}
+#historicoManutencao li,
+#agendamentosFuturos li {
+  border-bottom: 1px solid #f0f0f0; /* Linha separadora mais suave */
+  padding: 10px 15px;
+  font-size: 0.9em;
+  transition: background-color 0.2s ease;
+}
+#historicoManutencao li:last-child,
+#agendamentosFuturos li:last-child {
+  border-bottom: none;
+}
+#historicoManutencao li:hover,
+#agendamentosFuturos li:hover {
+  background-color: #f5faff; /* Azul bem claro no hover */
+}
+/* Estilo para mensagens de "nenhum" */
+#historicoManutencao p,
+#agendamentosFuturos p {
+  color: #777;
+  font-style: italic;
+  padding: 20px; /* Mais padding para centralizar melhor */
+  text-align: center;
+  margin: 0;
+}
+
+
+/* Estilos para Mensagens/Alertas */
+#mensagemStatus { /* ID específico para a barra de mensagem principal */
+  padding: 12px 20px;
+  margin: 0 20px 20px 20px; /* Margem superior 0, laterais e inferior 20 */
+  border-radius: 5px;
+  font-weight: 500;
+  text-align: center;
+  /* max-width: 90%; Não necessário com margem lateral */
+  display: block; /* Garante que é bloco */
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  border: 1px solid transparent;
+  font-size: 0.95em;
+  /* display: none; é controlado pelo JS */
+}
+#mensagemStatus.erro {
+  background-color: #ffebee;
+  color: #b71c1c;
+  border-color: #e57373;
+}
+#mensagemStatus.sucesso {
+  background-color: #e8f5e9;
+  color: #1b5e20;
+  border-color: #81c784;
+}
+#mensagemStatus.info {
+  background-color: #e3f2fd;
+  color: #0d47a1;
+  border-color: #64b5f6;
+}
+#mensagemStatus.aviso {
+  background-color: #fffde7;
+  color: #f57f17;
+  border-color: #ffee58;
+}
+
+
+/* Velocímetro */
+.velocimetro {
+  width: 100%; /* Ocupa largura do #displayVeiculoSelecionado */
+  max-width: 300px;
+  height: 22px;
+  background-color: #e0e0e0;
+  border-radius: 11px;
+  margin: 5px auto 15px auto; /* Ajusta margens */
+  overflow: hidden;
+  border: 1px solid #bdbdbd;
+}
+
+.velocimetro-barra {
+  height: 100%;
+  /* Gradiente mais vibrante */
+  background: linear-gradient(to right, #66bb6a, #ffee58, #ef5350);
+  width: 0%; /* Controlado pelo JS */
+  transition: width 0.4s ease-out;
+  border-radius: 11px; /* Arredondado em ambos os lados */
+}
+
+/* Status Ligado/Desligado no Display Principal */
+#veiculoStatusDisplay.status-ligado {
+  color: #388e3c; /* Verde escuro */
+  font-weight: bold;
+}
+#veiculoStatusDisplay.status-desligado {
+  color: #d32f2f; /* Vermelho escuro */
+  font-weight: bold;
+}
+
+/* Controles de Volume */
+.controles-volume {
+  margin-top: auto; /* Empurra para o final da coluna de controles */
+  background-color: #f5f5f5;
+  padding: 15px;
+  border-radius: 5px;
+  border: 1px solid #eee;
+  text-align: center; /* Centraliza os controles */
+}
+.controles-volume label {
+  margin: 0 8px 0 15px; /* Ajusta margens */
+  font-size: 0.9em;
+  vertical-align: middle;
+  display: inline-block; /* Permite alinhamento */
+}
+.controles-volume label:first-child {
+  margin-left: 0; /* Remove margem esquerda do primeiro */
+}
+.controles-volume input[type="range"] {
+  width: 120px;
+  vertical-align: middle;
+  cursor: pointer;
+}
+
+
+/* Responsividade */
+@media (max-width: 768px) {
+  h1 { font-size: 1.8em; }
+  .container-principal {
+      flex-direction: column; /* Empilha as colunas */
+      padding: 10px;
+      gap: 15px;
+  }
+  .coluna-controles,
+  .coluna-manutencao {
+      min-width: calc(100% - 20px); /* Ocupa quase toda a largura */
+      margin: 0 10px;
+      padding: 15px;
+  }
+  #selecaoVeiculosContainer {
+      margin-left: 10px;
+      margin-right: 10px;
+      padding: 15px;
+  }
+  .veiculo-card {
+      width: 140px; /* Cards menores */
+      padding: 10px;
+  }
+  .botoes-acao {
+      gap: 6px; /* Menos espaço entre botões */
+  }
+  .botoes-acao button {
+      padding: 9px 10px; /* Menor padding */
+      font-size: 13px;
+      min-width: 80px; /* Menor largura mínima */
+  }
+  #formAgendamento input, #formAgendamento select, #formAgendamento textarea {
+      /* Mantém 100% width, padding já ajusta */
+      padding: 8px;
+  }
+  .controles-volume {
+      padding: 10px;
+  }
+  .controles-volume label { margin: 0 5px 0 10px; }
+  .controles-volume input[type="range"] { width: 100px; }
+  #mensagemStatus {
+      margin-left: 10px;
+      margin-right: 10px;
+  }
+}
+
+@media (max-width: 480px) {
+   h1 { font-size: 1.5em; }
+   h2 { font-size: 1.2em; }
+   .veiculo-card {
+       width: calc(50% - 10px); /* Dois cards por linha */
+       margin-bottom: 10px;
+   }
+   .botoes-acao button {
+       min-width: 60px; /* Ainda menor se necessário */
+       font-size: 12px;
+   }
+   #formAgendamento button[type="submit"] {
+       width: 100%; /* Botão submit ocupa toda a largura */
+       padding: 12px;
+   }
+   .controles-volume label {
+       display: block; /* Labels em cima dos ranges */
+       margin: 5px 0 2px 0;
+       text-align: left;
+   }
+    .controles-volume input[type="range"] {
+       width: 100%;
+       margin-bottom: 10px;
+   }
+}
