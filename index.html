@@ -1,97 +1,143 @@
 <!DOCTYPE html>
 <html>
-
 <head>
-    <title>Meu Carro Virtual</title>
+    <title>Garagem Virtual IFPR</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap">
 </head>
-
 <body>
-    <audio id="somBuzina" src="mp3/buzina.mp3" preload="auto"></audio>
-    <audio id="somFreio" src="mp3/freio.mp3" preload="auto"></audio>
+    <h1>Garagem Virtual</h1>
 
-    <h1>Meu Carro</h1>
-    <img id="carroImagem" src="img/CarroMoranguinho.jpg" alt="Imagem do Carro">
-    <p>Modelo: Morango <span id="carroModelo"></span></p>
-    <p>Cor: Rosa <span id="carroCor"></span></p>
-    <p>Velocidade: <span id="carroVelocidade">0</span> km/h</p>
-    <div class="velocimetro">
-        <div class="velocimetro-barra" id="velocimetroMeuCarro"></div>
+    <!-- Área de Mensagens -->
+    <div id="mensagemStatus" class="mensagem" style="display: none;"></div>
+
+    <!-- Seleção de Veículos -->
+    <h2>Selecione um Veículo</h2>
+    <div id="selecaoVeiculosContainer" class="container-veiculos">
+        <p>Carregando veículos...</p>
+        <!-- Os cards dos veículos serão inseridos aqui pelo JS -->
     </div>
-    <p>Status: <span id="carroStatus" class="status-desligado">Desligado</span></p>
-    <button id="ligarBtn">Ligar</button>
-    <button id="desligarBtn">Desligar</button>
-    <button id="acelerarBtn">Acelerar</button>
-    <button id="frearBtn">Frear</button>
-    <button id="buzinarBtn">Buzinar</button>
 
-    <!-- Carro Esportivo -->
-    <h2>Carro Esportivo</h2>
-    <img id="carroEsportivoImagem" src="img/CarroEsportivo.jpg" alt="Imagem do Carro Esportivo" style="display: none;">
-    <p>Velocidade Esportiva: <span id="carroEsportivoVelocidade">0</span> km/h</p>
-    <div class="velocimetro">
-        <div class="velocimetro-barra" id="velocimetroCarroEsportivo"></div>
-    </div>
-    <p>Status Esportivo: <span id="carroEsportivoStatus" class="status-desligado">Desligado</span></p>
-    <button id="ligarEsportivoBtn">Ligar</button>
-    <button id="desligarEsportivoBtn">Desligar</button>
-    <button id="acelerarEsportivoBtn">Acelerar</button>
-    <button id="frearEsportivoBtn">Frear</button>
-    <button id="ativarTurboBtn">Ativar Turbo</button>
-    <button id="buzinarEsportivoBtn">Buzinar</button>
-    <p>Turbo: <span id="turboStatus">Desativado</span></p>
+    <hr>
 
-    <!-- Caminhão -->
-    <h2>Caminhão</h2>
-    <img id="caminhaoImagem" src="img/Caminhao.jpg" alt="Imagem do Caminhão" style="display: none;">
-    <p>Velocidade Caminhão: <span id="caminhaoVelocidade">0</span> km/h</p>
-    <div class="velocimetro">
-        <div class="velocimetro-barra" id="velocimetroCaminhao"></div>
-    </div>
-    <p>Status Caminhão: <span id="caminhaoStatus" class="status-desligado">Desligado</span></p>
-    <button id="ligarCaminhaoBtn">Ligar</button>
-    <button id="desligarCaminhaoBtn">Desligar</button>
-    <button id="acelerarCaminhaoBtn">Acelerar</button>
-    <button id="frearCaminhaoBtn">Frear</button>
-    <button id="buzinarCaminhaoBtn">Buzinar</button>
-    <label for="capacidadeCarga">Capacidade de Carga:</label>
-    <input type="number" id="capacidadeCarga" value="1000">
-    <label for="quantidadeCarga">Quantidade para Carregar/Descarregar:</label>
-    <input type="number" id="quantidadeCarga" value="100">
-    <button id="carregarBtn">Carregar</button>
-    <button id="descarregarBtn">Descarregar</button>
-    <p>Carga: <span id="cargaAtual">0</span>/<span id="capacidadeCargaSpan">1000</span> kg</p>
+    <div class="container-principal">
+        <!-- Coluna de Informações e Controles -->
+        <div class="coluna-controles">
+            <h2>Veículo Selecionado</h2>
+            <div id="informacoesVeiculo">Selecione um veículo na lista acima.</div>
 
-    <h2>Informações do Veículo</h2>
-    <div id="informacoesVeiculo">Clique em um botão para exibir as informações.</div>
-    <div id="mensagemErro" style="color: red; margin-top: 10px;"></div>
+            <!-- Área de display DINÂMICO do veículo selecionado -->
+            <div id="displayVeiculoSelecionado">
+                <p>Velocidade: <span id="veiculoVelocidadeDisplay">0</span> km/h</p>
+                <div class="velocimetro">
+                    <!-- ID ajustado para ser genérico -->
+                    <div class="velocimetro-barra" id="velocimetroBarraDisplay" style="width: 0%;"></div>
+                </div>
+                 <!-- ID ajustado para ser genérico -->
+                <p>Status: <span id="veiculoStatusDisplay" class="status-desligado">Desligado</span></p>
 
-    <button id="btnMeuCarro">Meu Carro</button>
-    <button id="btnCarroEsportivo">Carro Esportivo</button>
-    <button id="btnCaminhao">Caminhão</button>
+                <!-- Campos específicos (serão mostrados/ocultos pelo JS) -->
+                <p id="displayTurbo" style="display: none;">Turbo: <span id="turboStatus">Desativado</span></p>
+                <div id="displayCarga" style="display: none;">
+                   <p>Carga: <span id="cargaAtual">0</span>/<span id="capacidadeCargaSpan">--</span> kg</p>
+                   <label for="quantidadeCarga">Qtd:</label>
+                   <!-- Input de quantidade agora aqui -->
+                   <input type="number" id="quantidadeCarga" value="100" min="1" disabled>
+                </div>
+            </div>
 
-    <h2>Ações</h2>
-    <button id="acaoLigarBtn">Ligar</button>
-    <button id="acaoDesligarBtn">Desligar</button>
-    <button id="acaoAcelerarBtn">Acelerar</button>
-    <button id="acaoFrearBtn">Frear</button>
-    <button id="acaoAtivarTurboBtn">Ativar Turbo</button>
-    <button id="acaoDesativarTurboBtn">Desativar Turbo</button>
-    <button id="acaoCarregarBtn">Carregar</button>
-    <button id="acaoDescarregarBtn">Descarregar</button>
+            <h2>Ações</h2>
+            <div class="botoes-acao">
+                <button id="acaoLigarBtn" disabled>Ligar</button>
+                <button id="acaoDesligarBtn" disabled>Desligar</button>
+                <button id="acaoAcelerarBtn" disabled>Acelerar</button>
+                <button id="acaoFrearBtn" disabled>Frear</button>
+                <button id="acaoBuzinarBtn" disabled>Buzinar</button>
+                <button id="acaoAtivarTurboBtn" disabled>Ativar Turbo</button>
+                <button id="acaoDesativarTurboBtn" disabled>Desativar Turbo</button>
+                <button id="acaoCarregarBtn" disabled>Carregar</button>
+                <button id="acaoDescarregarBtn" disabled>Descarregar</button>
+            </div>
 
-    <h2>Controles de Volume</h2>
-    <label for="volumeBuzina">Buzina:</label>
-    <input type="range" id="volumeBuzina" min="0" max="1" step="0.1" value="1">
+             <h2>Controles de Volume</h2>
+             <div class="controles-volume">
+                 <label for="volumeBuzina">Buzina:</label>
+                 <input type="range" id="volumeBuzina" min="0" max="1" step="0.1" value="0.8">
 
-    <label for="volumeAceleracao">Aceleração:</label>
-    <input type="range" id="volumeAceleracao" min="0" max="1" step="0.1" value="1">
+                 <label for="volumeAceleracao">Aceleração:</label>
+                 <input type="range" id="volumeAceleracao" min="0" max="1" step="0.1" value="0.5">
 
-    <label for="volumeFreio">Freio:</label>
-    <input type="range" id="volumeFreio" min="0" max="1" step="0.1" value="1">
+                 <label for="volumeFreio">Freio:</label>
+                 <input type="range" id="volumeFreio" min="0" max="1" step="0.1" value="0.7">
+             </div>
+        </div>
 
+        <!-- Coluna de Manutenção -->
+        <div class="coluna-manutencao">
+            <h2>Manutenção</h2>
+
+            <!-- Formulário de Agendamento -->
+            <form id="formAgendamento">
+                 <fieldset id="fieldsetAgendamento" disabled>
+                     <legend>Agendar/Registrar Manutenção</legend>
+                     <div>
+                         <label for="manutencaoVeiculo">Veículo:</label>
+                         <select id="manutencaoVeiculo" required>
+                             <option value="">-- Selecione --</option>
+                             <!-- Opções preenchidas pelo JS -->
+                         </select>
+                     </div>
+                     <div>
+                         <label for="manutencaoData">Data:</label>
+                         <input type="date" id="manutencaoData" required>
+                     </div>
+                     <div>
+                         <label for="manutencaoTipo">Tipo:</label>
+                         <input type="text" id="manutencaoTipo" placeholder="Ex: Troca de óleo" required>
+                     </div>
+                     <div>
+                         <label for="manutencaoCusto">Custo (R$):</label>
+                         <input type="number" id="manutencaoCusto" step="0.01" min="0" placeholder="Ex: 150.00" required>
+                     </div>
+                     <div>
+                         <label for="manutencaoDescricao">Descrição (Opcional):</label>
+                         <textarea id="manutencaoDescricao" rows="2" placeholder="Detalhes do serviço"></textarea>
+                     </div>
+                     <button type="submit">Agendar/Registrar</button>
+                 </fieldset>
+            </form>
+
+            <hr>
+
+            <!-- Histórico de Manutenção (para o veículo selecionado) -->
+            <div id="historicoManutencaoContainer">
+                <h3>Histórico de Manutenção</h3>
+                <div id="historicoManutencao">
+                    <p>Selecione um veículo para ver o histórico.</p>
+                </div>
+            </div>
+
+            <hr>
+
+            <!-- Agendamentos Futuros (para o veículo selecionado) -->
+            <div id="agendamentosFuturosContainer">
+                <h3>Agendamentos Futuros</h3>
+                <div id="agendamentosFuturos">
+                    <p>Selecione um veículo para ver os agendamentos.</p>
+                </div>
+            </div>
+        </div>
+    </div> <!-- Fim do container-principal -->
+
+    <!-- Áudios Preload -->
+    <!-- <audio id="somLigando" src="mp3/ligando.mp3" preload="auto"></audio> -->
+    <!-- <audio id="somAcelerando" src="mp3/acelerando.mp3" preload="auto" loop></audio> -->
+    <!-- <audio id="somBuzina" src="mp3/buzina.mp3" preload="auto"></audio> -->
+    <!-- <audio id="somFreio" src="mp3/freio.mp3" preload="auto"></audio> -->
+    <!-- <audio id="somTurbo" src="mp3/turbo.mp3" preload="auto"></audio> -->
+    <!-- Obs: A criação do new Audio() no JS já faz o preload implícito geralmente -->
+
+    <!-- Script JS no final -->
     <script src="script.js"></script>
 </body>
-
 </html>
