@@ -30,10 +30,8 @@
             <div id="displayVeiculoSelecionado">
                 <p>Velocidade: <span id="veiculoVelocidadeDisplay">0</span> km/h</p>
                 <div class="velocimetro">
-                    <!-- ID ajustado para ser genérico -->
                     <div class="velocimetro-barra" id="velocimetroBarraDisplay" style="width: 0%;"></div>
                 </div>
-                 <!-- ID ajustado para ser genérico -->
                 <p>Status: <span id="veiculoStatusDisplay" class="status-desligado">Desligado</span></p>
 
                 <!-- Campos específicos (serão mostrados/ocultos pelo JS) -->
@@ -41,7 +39,6 @@
                 <div id="displayCarga" style="display: none;">
                    <p>Carga: <span id="cargaAtual">0</span>/<span id="capacidadeCargaSpan">--</span> kg</p>
                    <label for="quantidadeCarga">Qtd:</label>
-                   <!-- Input de quantidade agora aqui -->
                    <input type="number" id="quantidadeCarga" value="100" min="1" disabled>
                 </div>
             </div>
@@ -58,6 +55,16 @@
                 <button id="acaoCarregarBtn" disabled>Carregar</button>
                 <button id="acaoDescarregarBtn" disabled>Descarregar</button>
             </div>
+
+            <!-- NOVO: Área para exibir detalhes extras da API -->
+            <div id="detalhesExtrasContainer">
+                <h3>Detalhes Extras (API)</h3>
+                <div id="detalhesExtrasVeiculo" class="detalhes-extras-box">
+                    <p>Clique em "Ver Detalhes" em um veículo acima para carregar informações adicionais.</p>
+                </div>
+            </div>
+
+            <hr> <!-- Adiciona uma linha para separar visualmente -->
 
              <h2>Controles de Volume</h2>
              <div class="controles-volume">
@@ -128,14 +135,6 @@
             </div>
         </div>
     </div> <!-- Fim do container-principal -->
-
-    <!-- Áudios Preload -->
-    <!-- <audio id="somLigando" src="mp3/ligando.mp3" preload="auto"></audio> -->
-    <!-- <audio id="somAcelerando" src="mp3/acelerando.mp3" preload="auto" loop></audio> -->
-    <!-- <audio id="somBuzina" src="mp3/buzina.mp3" preload="auto"></audio> -->
-    <!-- <audio id="somFreio" src="mp3/freio.mp3" preload="auto"></audio> -->
-    <!-- <audio id="somTurbo" src="mp3/turbo.mp3" preload="auto"></audio> -->
-    <!-- Obs: A criação do new Audio() no JS já faz o preload implícito geralmente -->
 
     <!-- Script JS no final -->
     <script src="script.js"></script>

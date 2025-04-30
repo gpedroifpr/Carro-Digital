@@ -148,7 +148,7 @@ hr {
   background-color: #1a4db8;
 }
 
-.btn-remover-veiculo {
+.btn-remover-veiculo { /* Mantido caso queira reativar, mas não usado */
   background-color: #f44336; /* Vermelho */
   color: white;
   border: none;
@@ -476,6 +476,81 @@ button:disabled {
   cursor: pointer;
 }
 
+/* NOVO: Estilos para Detalhes Extras */
+#detalhesExtrasContainer {
+  margin-top: 20px; /* Espaço acima */
+  margin-bottom: 20px; /* Espaço abaixo antes da linha ou do próximo elemento */
+}
+
+#detalhesExtrasContainer h3 {
+  text-align: left; /* Alinha o título à esquerda */
+  margin-bottom: 8px;
+  font-size: 1.05em;
+  color: #00695c; /* Verde azulado escuro */
+}
+
+.detalhes-extras-box {
+  background-color: #e0f2f1; /* Fundo verde bem claro (teal) */
+  border: 1px solid #b2dfdb;
+  border-left: 5px solid #00796b; /* Borda esquerda teal */
+  padding: 15px;
+  border-radius: 4px;
+  min-height: 60px; /* Altura mínima */
+  font-size: 0.9em;
+  transition: background-color 0.3s ease; /* Suaviza a mudança de cor */
+}
+
+.detalhes-extras-box p,
+.detalhes-extras-box ul {
+  margin: 0;
+  padding: 0;
+}
+.detalhes-extras-box ul {
+  list-style-position: inside; /* Coloca marcadores dentro da caixa */
+  padding-left: 5px; /* Pequeno recuo para a lista */
+}
+
+.detalhes-extras-box li {
+  margin-bottom: 5px; /* Espaço entre itens da lista */
+}
+
+.detalhes-extras-box strong {
+  color: #004d40; /* Tom mais escuro para destaque */
+}
+
+/* Estilo para mensagem de carregando/erro */
+.detalhes-extras-box.loading {
+  font-style: italic;
+  color: #00796b;
+  background-color: #fff3e0; /* Laranja claro */
+  border-color: #ffe0b2;
+  border-left-color: #ff9800; /* Laranja */
+}
+
+.detalhes-extras-box.error {
+  font-style: italic;
+  color: #b71c1c; /* Vermelho escuro */
+  background-color: #ffebee; /* Vermelho claro */
+  border-color: #ffcdd2;
+  border-left-color: #f44336; /* Vermelho */
+}
+
+/* Botão Ver Detalhes no Card */
+.btn-ver-detalhes {
+  background-color: #00796b; /* Verde azulado (teal) */
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 7px 10px; /* Mesmo padding dos outros botões do card */
+  font-size: 0.85em;
+  cursor: pointer;
+  margin-left: 5px; /* Espaço do botão selecionar */
+  transition: background-color 0.2s ease;
+}
+.btn-ver-detalhes:hover {
+  background-color: #004d40; /* Teal mais escuro */
+}
+
 
 /* Responsividade */
 @media (max-width: 768px) {
@@ -521,6 +596,9 @@ button:disabled {
       margin-left: 10px;
       margin-right: 10px;
   }
+  /* Ajuste para detalhes extras em telas menores */
+  #detalhesExtrasContainer { margin: 15px 0; }
+  .detalhes-extras-box { padding: 12px; }
 }
 
 @media (max-width: 480px) {
@@ -530,6 +608,14 @@ button:disabled {
        width: calc(50% - 10px); /* Dois cards por linha */
        margin-bottom: 10px;
    }
+    /* Ajustar botões do card para caber melhor */
+    .veiculo-card button {
+        padding: 6px 8px;
+        font-size: 0.8em;
+        margin: 3px 2px 0 2px;
+    }
+    .btn-ver-detalhes { margin-left: 3px; }
+
    .botoes-acao button {
        min-width: 60px; /* Ainda menor se necessário */
        font-size: 12px;

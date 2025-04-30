@@ -1,0 +1,34 @@
+[
+    {
+      "identificador": "Moranguinho",
+      "valorFipe": "R$ 25.000,00",
+      "recallPendente": false,
+      "dicaManutencao": "Verificar nível do óleo a cada 5.000km. Cor favorita: Rosa.",
+      "anoModelo": 2018,
+      "consumoUrbano": "12 km/l"
+    },
+    {
+      "identificador": "Veloz",
+      "valorFipe": "R$ 150.000,00",
+      "recallPendente": true,
+      "descricaoRecall": "Verificar sistema de freios (Campanha #VLZ01)",
+      "dicaManutencao": "Calibrar pneus esportivos semanalmente. Evitar lombadas.",
+      "anoModelo": 2022,
+      "aceleracao0a100": "4.5s"
+    },
+    {
+      "identificador": "Brutus",
+      "valorFipe": "R$ 220.000,00",
+      "recallPendente": false,
+      "dicaManutencao": "Inspecionar sistema de suspensão após cargas pesadas. Lubrificar 5ª roda.",
+      "anoModelo": 2020,
+      "capacidadeReboque": "5 Ton"
+    },
+    {
+      "identificador": "RelampagoMarquinhos",
+      "valorFipe": "R$ 95.000,00",
+      "recallPendente": false,
+      "dicaManutencao": "Encerar a pintura regularmente para manter o brilho. Katchau!",
+      "anoModelo": 2006
+    }
+  ]
