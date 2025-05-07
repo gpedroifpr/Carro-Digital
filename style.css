@@ -72,7 +72,7 @@ hr {
   background-color: #e8f0fe; /* Fundo azul mais claro */
   margin: 0 20px 20px 20px; /* Margem nas laterais */
   border-radius: 8px;
-  border: 1px solid #cdd6f4; /* COR CORRIGIDA - Era #c_cd_d6 */
+  border: 1px solid #cdd6f4;
 }
 /* Mensagem quando não há veículos */
 #selecaoVeiculosContainer > p {
@@ -84,7 +84,7 @@ hr {
 
 .veiculo-card {
   background-color: #fff;
-  border: 1px solid #dae6dd; /* COR CORRIGIDA - Era #d_ae_dd */
+  border: 1px solid #dae6dd;
   border-radius: 8px;
   padding: 12px;
   text-align: center;
@@ -385,14 +385,13 @@ button:disabled {
 }
 
 
-/* Estilos para Mensagens/Alertas */
-#mensagemStatus { /* ID específico para a barra de mensagem principal */
+/* Estilos para Mensagens/Alertas (Globais da Garagem) */
+#mensagemStatus { /* ID específico para a barra de mensagem principal da garagem */
   padding: 12px 20px;
   margin: 0 20px 20px 20px; /* Margem superior 0, laterais e inferior 20 */
   border-radius: 5px;
   font-weight: 500;
   text-align: center;
-  /* max-width: 90%; Não necessário com margem lateral */
   display: block; /* Garante que é bloco */
   box-shadow: 0 2px 5px rgba(0,0,0,0.1);
   border: 1px solid transparent;
@@ -476,7 +475,7 @@ button:disabled {
   cursor: pointer;
 }
 
-/* NOVO: Estilos para Detalhes Extras */
+/* Detalhes Extras (API Veículos) */
 #detalhesExtrasContainer {
   margin-top: 20px; /* Espaço acima */
   margin-bottom: 20px; /* Espaço abaixo antes da linha ou do próximo elemento */
@@ -518,7 +517,7 @@ button:disabled {
   color: #004d40; /* Tom mais escuro para destaque */
 }
 
-/* Estilo para mensagem de carregando/erro */
+/* Estilo para mensagem de carregando/erro na API de Veículos */
 .detalhes-extras-box.loading {
   font-style: italic;
   color: #00796b;
@@ -534,6 +533,14 @@ button:disabled {
   border-color: #ffcdd2;
   border-left-color: #f44336; /* Vermelho */
 }
+.detalhes-extras-box.info { /* Para quando não encontrar dados na API de veículos */
+  font-style: italic;
+  color: #01579b; /* Azul escuro */
+  background-color: #e1f5fe; /* Azul claro */
+  border-color: #b3e5fc;
+  border-left-color: #0288d1; /* Azul */
+}
+
 
 /* Botão Ver Detalhes no Card */
 .btn-ver-detalhes {
@@ -634,3 +641,179 @@ button:disabled {
        margin-bottom: 10px;
    }
 }
+
+/* --- ESTILOS PARA PREVISÃO DO TEMPO --- */
+.container-previsao-tempo {
+    background-color: #fff;
+    padding: 20px;
+    margin: 20px; /* Ajuste conforme necessário */
+    border-radius: 8px;
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.08);
+}
+
+.container-previsao-tempo h2 {
+    color: #0277bd; /* Azul um pouco diferente para esta seção */
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.form-clima {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 25px;
+    justify-content: center;
+    align-items: center;
+}
+
+#cidadeInput {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 1em;
+    flex-grow: 1;
+    max-width: 400px; /* Limita a largura do input */
+}
+#cidadeInput:focus {
+    border-color: #0288d1;
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(2, 136, 209, 0.2);
+}
+
+#verificarClimaBtn {
+    padding: 10px 20px;
+    background-color: #0288d1; /* Azul */
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1em;
+    transition: background-color 0.2s ease;
+}
+#verificarClimaBtn:hover:not(:disabled) {
+    background-color: #0277bd;
+}
+#verificarClimaBtn:disabled {
+    background-color: #bdbdbd !important;
+    cursor: not-allowed;
+}
+
+/* Mensagem de status específica para o clima (se precisar de estilo diferente da geral) */
+#climaMensagemStatus {
+    margin-bottom: 15px; /* Ajuste conforme necessário */
+    /* Herda estilos de .mensagem, mas pode ter overrides aqui */
+    padding: 12px 20px;
+    border-radius: 5px;
+    font-weight: 500;
+    text-align: center;
+    display: block;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    border: 1px solid transparent;
+    font-size: 0.95em;
+}
+#climaMensagemStatus.erro { background-color: #ffebee; color: #c62828; border-color: #ef9a9a; }
+#climaMensagemStatus.aviso { background-color: #fff8e1; color: #ff8f00; border-color: #ffe082; }
+#climaMensagemStatus.info { background-color: #e1f5fe; color: #0277bd; border-color: #4fc3f7; }
+/* Para garantir que a mensagem de sucesso do clima tenha o mesmo estilo da global */
+#climaMensagemStatus.sucesso { background-color: #e8f5e9; color: #1b5e20; border-color: #81c784; }
+
+
+#previsaoTempoResultado {
+    margin-top: 20px;
+}
+#previsaoTempoResultado h3 {
+    text-align: center;
+    color: #01579b; /* Azul escuro */
+    margin-bottom: 15px;
+    font-size: 1.3em;
+}
+#previsaoTempoResultado p { /* Estilo para mensagens de "sem previsão", "carregando" */
+    text-align: center;
+    font-style: italic;
+    color: #555;
+    padding: 10px;
+}
+#previsaoTempoResultado p.carregando-clima {
+    font-weight: bold;
+    color: #0277bd;
+}
+
+.clima-cards-wrapper {
+    display: flex;
+    flex-wrap: wrap; /* Quebra linha em telas menores */
+    gap: 15px;
+    justify-content: center; /* Centraliza os cards se não preencherem a linha */
+}
+
+.clima-card-dia {
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 6px;
+    padding: 15px;
+    text-align: center;
+    min-width: 150px; /* Largura mínima de cada card */
+    flex: 1; /* Permite que os cards cresçam */
+    max-width: 180px; /* Largura máxima para não ficarem muito largos */
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.clima-card-dia:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.clima-card-dia h4 { /* Data e dia da semana */
+    margin-top: 0;
+    margin-bottom: 8px;
+    font-size: 1.1em;
+    color: #343a40;
+    font-weight: 500;
+}
+
+.clima-card-dia img {
+    width: 60px; /* Tamanho do ícone */
+    height: 60px;
+    margin-bottom: 5px;
+}
+
+.clima-card-dia .temperaturas {
+    font-size: 1.1em;
+    font-weight: bold;
+    margin-bottom: 8px;
+}
+.clima-card-dia .temp-max {
+    color: #e63946; /* Vermelho para máxima */
+}
+.clima-card-dia .temp-min {
+    color: #1d3557; /* Azul escuro para mínima */
+}
+
+.clima-card-dia .descricao-clima {
+    font-size: 0.9em;
+    color: #495057;
+    margin-bottom: 0;
+    min-height: 3em; /* Para alinhar cards com descrições de tamanhos diferentes */
+}
+
+/* Responsividade para os cards de clima */
+@media (max-width: 600px) {
+    .clima-cards-wrapper {
+        flex-direction: column; /* Empilha os cards */
+        align-items: center; /* Centraliza os cards empilhados */
+    }
+    .clima-card-dia {
+        min-width: 250px; /* Cards ocupam mais largura quando empilhados */
+        max-width: 90%;
+    }
+    .form-clima {
+        flex-direction: column;
+    }
+    #cidadeInput {
+        width: 100%;
+        max-width: none;
+    }
+    #verificarClimaBtn {
+        width: 100%;
+    }
+}
+
+/* --- FIM DOS ESTILOS PARA PREVISÃO DO TEMPO --- */

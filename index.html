@@ -8,7 +8,7 @@
 <body>
     <h1>Garagem Virtual</h1>
 
-    <!-- Área de Mensagens -->
+    <!-- Área de Mensagens Global da Garagem -->
     <div id="mensagemStatus" class="mensagem" style="display: none;"></div>
 
     <!-- Seleção de Veículos -->
@@ -56,9 +56,9 @@
                 <button id="acaoDescarregarBtn" disabled>Descarregar</button>
             </div>
 
-            <!-- NOVO: Área para exibir detalhes extras da API -->
+            <!-- NOVO: Área para exibir detalhes extras da API (veículos) -->
             <div id="detalhesExtrasContainer">
-                <h3>Detalhes Extras (API)</h3>
+                <h3>Detalhes Extras (API Veículos)</h3>
                 <div id="detalhesExtrasVeiculo" class="detalhes-extras-box">
                     <p>Clique em "Ver Detalhes" em um veículo acima para carregar informações adicionais.</p>
                 </div>
@@ -135,6 +135,25 @@
             </div>
         </div>
     </div> <!-- Fim do container-principal -->
+
+    <hr> <!-- Separador visual -->
+
+    <!-- NOVA SEÇÃO: Previsão do Tempo -->
+    <div class="container-previsao-tempo">
+        <h2>Previsão do Tempo (5 Dias)</h2>
+        <div id="climaMensagemStatus" class="mensagem" style="display: none;"></div>
+
+        <div class="form-clima">
+            <input type="text" id="cidadeInput" placeholder="Digite o nome da cidade">
+            <button id="verificarClimaBtn">Ver Previsão</button>
+        </div>
+
+        <div id="previsaoTempoResultado" class="resultado-clima-container">
+            <!-- Os resultados da previsão serão inseridos aqui pelo JS -->
+            <p>Digite uma cidade e clique em "Ver Previsão" para começar.</p>
+        </div>
+    </div>
+    <!-- FIM DA NOVA SEÇÃO: Previsão do Tempo -->
 
     <!-- Script JS no final -->
     <script src="script.js"></script>
