@@ -1058,6 +1058,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     console.log("Aplicação Garagem Virtual inicializada e listeners da garagem configurados.");
     verificarNotificacoesAgendamento(); // Verifica notificações uma vez no carregamento
+
+    // INICIALIZA O TÍTULO DA PREVISÃO DO TEMPO
+    atualizarTituloPrevisao(null, numDiasPrevisaoSelecionado);
 });
 
 
@@ -1073,6 +1076,30 @@ const cidadeInputElement = document.getElementById('cidadeInput');
 const verificarClimaBtnElement = document.getElementById('verificarClimaBtn');
 const previsaoTempoResultadoElement = document.getElementById('previsaoTempoResultado');
 const climaMensagemStatusElement = document.getElementById('climaMensagemStatus');
+
+// NOVO: Variáveis para controle de dias e armazenamento da última previsão
+let numDiasPrevisaoSelecionado = 5; // Padrão: 5 dias
+let ultimaPrevisaoCompletaProcessada = null; // Armazena a previsão completa (5-6 dias)
+let ultimaCidadePesquisada = null; // Armazena a última cidade pesquisada
+
+const tituloPrevisaoTempoElement = document.getElementById('tituloPrevisaoTempo'); // Pega o elemento do título
+
+/**
+ * Atualiza o título principal da seção de previsão do tempo.
+ * @param {string | null} nomeCidade - Nome da cidade, ou null se nenhuma cidade estiver carregada.
+ * @param {number} numDias - Número de dias para exibir no título.
+ */
+function atualizarTituloPrevisao(nomeCidade, numDias) {
+    if (tituloPrevisaoTempoElement) {
+        let textoTitulo = `Previsão do Tempo (${numDias} dia${numDias > 1 ? 's' : ''})`;
+        if (nomeCidade) {
+            const nomeCidadeFormatado = nomeCidade.charAt(0).toUpperCase() + nomeCidade.slice(1);
+            textoTitulo += ` para ${nomeCidadeFormatado}`;
+        }
+        tituloPrevisaoTempoElement.textContent = textoTitulo;
+    }
+}
+
 
 /**
  * Exibe uma mensagem na área de status da previsão do tempo.
@@ -1115,10 +1142,6 @@ async function buscarPrevisaoDetalhada(cidade) {
     console.log("[CLIMA DEBUG] Iniciando buscarPrevisaoDetalhada para:", cidade);
     console.log("[CLIMA DEBUG] Verificando apiKeyOpenWeather no início da função:", `'${apiKeyOpenWeather}'`);
 
-        // NOVA Condição para verificar a API Key - mais simples
-    // Verifica apenas se a chave é uma string não vazia e se não é EXATAMENTE o placeholder.
-    // O placeholder "SUA_CHAVE_OPENWEATHERMAP_AQUI" tem 30 caracteres. Sua chave real tem 32.
-    // Mas para ser mais seguro, verificaremos apenas se não é o placeholder e se tem um comprimento razoável.
     if (typeof apiKeyOpenWeather !== 'string' || apiKeyOpenWeather.trim() === "" || apiKeyOpenWeather === "SUA_CHAVE_OPENWEATHERMAP_AQUI" || apiKeyOpenWeather.length < 32) {
         console.error("[CLIMA ERRO] API Key da OpenWeatherMap não configurada corretamente ou inválida. Valor atual:", `'${apiKeyOpenWeather}'`, "Comprimento:", apiKeyOpenWeather.length);
         exibirMensagemClima("Erro de configuração: API Key inválida ou não definida.", "erro");
@@ -1140,10 +1163,9 @@ async function buscarPrevisaoDetalhada(cidade) {
         console.log("[CLIMA DEBUG] Dados brutos da API de previsão recebidos:", data);
         return data;
     } catch (error) {
-        // O erro já pode ter uma mensagem útil (da API ou do if da API Key)
         const mensagemFinalErro = (error instanceof Error && error.message) ? error.message : "Falha na comunicação com a API de previsão.";
         console.error("[CLIMA ERRO] Falha na requisição da previsão (catch geral):", error);
-        throw new Error(mensagemFinalErro); // Relança com a mensagem processada
+        throw new Error(mensagemFinalErro);
     }
 }
 
@@ -1177,15 +1199,14 @@ function processarDadosForecast(dataApi) {
     });
 
     const resultadoFinal = [];
-    const diasOrdenados = Object.keys(previsoesPorDia).sort(); // Garante ordem cronológica
+    const diasOrdenados = Object.keys(previsoesPorDia).sort();
 
     for (const diaKey of diasOrdenados) {
         const diaAgrupado = previsoesPorDia[diaKey];
-        if (!diaAgrupado.entradas || diaAgrupado.entradas.length === 0) continue; // Pula dia sem entradas
+        if (!diaAgrupado.entradas || diaAgrupado.entradas.length === 0) continue;
 
         let tempMinDia = Infinity;
         let tempMaxDia = -Infinity;
-        // Pega a primeira entrada do dia para ícone/descrição representativa
         const previsaoRepresentativa = diaAgrupado.entradas[0];
 
         diaAgrupado.entradas.forEach(entrada => {
@@ -1193,8 +1214,7 @@ function processarDadosForecast(dataApi) {
             if (entrada.temp_max_item > tempMaxDia) tempMaxDia = entrada.temp_max_item;
         });
         
-        // Usar UTC para formatação para evitar problemas de fuso local na data exibida
-        const dataObj = new Date(diaAgrupado.dataISO + 'T12:00:00Z'); // Adiciona hora para ser meio-dia UTC
+        const dataObj = new Date(diaAgrupado.dataISO + 'T12:00:00Z');
         const dataFormatada = dataObj.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', timeZone: 'UTC' });
         const diaSemana = dataObj.toLocaleDateString('pt-BR', { weekday: 'short', timeZone: 'UTC' }).replace('.', '').toUpperCase();
 
@@ -1212,31 +1232,37 @@ function processarDadosForecast(dataApi) {
 
 /**
  * @function exibirPrevisaoDetalhada
- * @description Exibe a previsão na UI.
- * @param {Array<object>} previsaoDiariaProcessada - Array de dias processados.
+ * @description Exibe a previsão na UI para um número específico de dias.
+ * @param {Array<object>} previsaoDiariaProcessadaCompleta - Array de todos os dias processados (geralmente 5-6 dias).
  * @param {string} nomeCidade - Nome da cidade.
+ * @param {number} numDiasExibir - Número de dias que o usuário quer ver.
  */
-function exibirPrevisaoDetalhada(previsaoDiariaProcessada, nomeCidade) {
+function exibirPrevisaoDetalhada(previsaoDiariaProcessadaCompleta, nomeCidade, numDiasExibir) {
     if (!previsaoTempoResultadoElement) {
         console.error("[CLIMA ERRO] Elemento #previsaoTempoResultado não encontrado para exibir.");
         return;
     }
     previsaoTempoResultadoElement.innerHTML = ''; // Limpa antes
 
-    const nomeCidadeFormatado = nomeCidade.charAt(0).toUpperCase() + nomeCidade.slice(1);
+    // Atualiza o título principal da seção
+    atualizarTituloPrevisao(nomeCidade, numDiasExibir);
 
-    if (!previsaoDiariaProcessada || previsaoDiariaProcessada.length === 0) {
-        previsaoTempoResultadoElement.innerHTML = `<p>Não há dados de previsão para exibir para ${nomeCidadeFormatado}.</p>`;
+    if (!previsaoDiariaProcessadaCompleta || previsaoDiariaProcessadaCompleta.length === 0) {
+        previsaoTempoResultadoElement.innerHTML = `<p>Não há dados de previsão para exibir para ${nomeCidade.charAt(0).toUpperCase() + nomeCidade.slice(1)}.</p>`;
         return;
     }
 
-    const tituloPrevisao = document.createElement('h3');
-    tituloPrevisao.textContent = `Previsão para ${nomeCidadeFormatado}`;
-    previsaoTempoResultadoElement.appendChild(tituloPrevisao);
+    // Fatia a previsão para o número de dias desejado pelo usuário
+    const previsaoParaExibir = previsaoDiariaProcessadaCompleta.slice(0, numDiasExibir);
+
+    if (previsaoParaExibir.length === 0) {
+        previsaoTempoResultadoElement.innerHTML = `<p>Não há dados de previsão suficientes para exibir ${numDiasExibir} dia(s) para ${nomeCidade.charAt(0).toUpperCase() + nomeCidade.slice(1)}.</p>`;
+        return;
+    }
 
     const containerCards = document.createElement('div');
     containerCards.className = 'clima-cards-wrapper';
-    previsaoDiariaProcessada.forEach(dia => {
+    previsaoParaExibir.forEach(dia => {
         const cardDia = document.createElement('div');
         cardDia.className = 'clima-card-dia';
         cardDia.innerHTML = `
@@ -1264,34 +1290,39 @@ if (verificarClimaBtnElement && cidadeInputElement) {
         }
 
         if (previsaoTempoResultadoElement) previsaoTempoResultadoElement.innerHTML = `<p class="carregando-clima">Carregando previsão para ${cidade}...</p>`;
-        if (climaMensagemStatusElement) climaMensagemStatusElement.style.display = 'none'; // Esconde mensagens anteriores
+        if (climaMensagemStatusElement) climaMensagemStatusElement.style.display = 'none';
         verificarClimaBtnElement.disabled = true;
         cidadeInputElement.disabled = true;
+        // Atualiza o título para mostrar que está carregando para a cidade, com o número de dias já selecionado
+        atualizarTituloPrevisao(cidade, numDiasPrevisaoSelecionado);
+
 
         try {
             const dadosBrutos = await buscarPrevisaoDetalhada(cidade);
-            // Se buscarPrevisaoDetalhada lançar um erro, o catch abaixo irá lidar com ele.
-            // Se chegar aqui, dadosBrutos deve ser o objeto da API.
-            const previsaoProcessada = processarDadosForecast(dadosBrutos);
+            const previsaoProcessadaCompleta = processarDadosForecast(dadosBrutos); // Processa todos os dias disponíveis
 
-            if (previsaoProcessada && previsaoProcessada.length > 0) {
-                exibirPrevisaoDetalhada(previsaoProcessada, cidade);
-                // exibirMensagemClima(`Previsão para ${cidade} carregada.`, "sucesso"); // Sucesso é opcional
+            if (previsaoProcessadaCompleta && previsaoProcessadaCompleta.length > 0) {
+                ultimaPrevisaoCompletaProcessada = previsaoProcessadaCompleta; // Armazena a previsão completa
+                ultimaCidadePesquisada = cidade; // Armazena a cidade
+                // Exibe a previsão com o número de dias atualmente selecionado
+                exibirPrevisaoDetalhada(ultimaPrevisaoCompletaProcessada, ultimaCidadePesquisada, numDiasPrevisaoSelecionado);
             } else {
-                // Se dadosBrutos foi ok, mas processarDadosForecast retornou nulo/vazio.
+                ultimaPrevisaoCompletaProcessada = null;
+                ultimaCidadePesquisada = null;
                 exibirMensagemClima(`Não foi possível processar os dados da previsão para ${cidade}, ou não há informações disponíveis.`, "info");
                 if (previsaoTempoResultadoElement) previsaoTempoResultadoElement.innerHTML = `<p>Sem previsão detalhada disponível para ${cidade}.</p>`;
+                atualizarTituloPrevisao(null, numDiasPrevisaoSelecionado); // Reseta título se não houver dados
             }
         } catch (error) {
-            // Erros de buscarPrevisaoDetalhada (incluindo API key e erros da API) virão aqui.
+            ultimaPrevisaoCompletaProcessada = null;
+            ultimaCidadePesquisada = null;
             console.error("[CLIMA ERRO] Erro no fluxo de verificação do clima (event listener):", error.message);
-            // A mensagem de erro já deve ser a específica da API ou da verificação da key.
             exibirMensagemClima(`Erro: ${error.message || 'Falha desconhecida ao buscar previsão.'}`, "erro");
             if (previsaoTempoResultadoElement) previsaoTempoResultadoElement.innerHTML = `<p>Ocorreu um erro ao buscar a previsão. Tente novamente.</p>`;
+            atualizarTituloPrevisao(null, numDiasPrevisaoSelecionado); // Reseta título em caso de erro
         } finally {
             verificarClimaBtnElement.disabled = false;
             cidadeInputElement.disabled = false;
-            cidadeInputElement.focus();
         }
     });
 
@@ -1303,6 +1334,26 @@ if (verificarClimaBtnElement && cidadeInputElement) {
     });
 } else {
     console.warn("Elementos da UI de previsão do tempo não encontrados (#cidadeInput, #verificarClimaBtn, etc.).");
+}
+
+// NOVO: Event Listeners para os botões de seleção de dias
+const botoesDiasPrevisao = document.querySelectorAll('.btn-dias-previsao');
+if (botoesDiasPrevisao.length > 0) {
+    botoesDiasPrevisao.forEach(botao => {
+        botao.addEventListener('click', () => {
+            botoesDiasPrevisao.forEach(b => b.classList.remove('ativo'));
+            botao.classList.add('ativo');
+
+            numDiasPrevisaoSelecionado = parseInt(botao.getAttribute('data-dias'));
+            console.log(`Número de dias selecionado: ${numDiasPrevisaoSelecionado}`);
+
+            if (ultimaPrevisaoCompletaProcessada && ultimaCidadePesquisada) {
+                exibirPrevisaoDetalhada(ultimaPrevisaoCompletaProcessada, ultimaCidadePesquisada, numDiasPrevisaoSelecionado);
+            } else {
+                atualizarTituloPrevisao(null, numDiasPrevisaoSelecionado);
+            }
+        });
+    });
 }
 
 // --- FIM DA SEÇÃO DE PREVISÃO DO TEMPO ---

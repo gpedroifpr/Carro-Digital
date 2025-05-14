@@ -140,8 +140,17 @@
 
     <!-- NOVA SEÇÃO: Previsão do Tempo -->
     <div class="container-previsao-tempo">
-        <h2>Previsão do Tempo (5 Dias)</h2>
+        <!-- TÍTULO MODIFICADO PARA ATUALIZAÇÃO DINÂMICA -->
+        <h2 id="tituloPrevisaoTempo">Previsão do Tempo (5 Dias)</h2>
         <div id="climaMensagemStatus" class="mensagem" style="display: none;"></div>
+
+        <!-- NOVO: CONTROLES PARA SELECIONAR NÚMERO DE DIAS -->
+        <div class="controles-previsao-dias">
+            <label>Ver previsão para:</label>
+            <button class="btn-dias-previsao ativo" data-dias="5">5 Dias</button>
+            <button class="btn-dias-previsao" data-dias="3">3 Dias</button>
+            <button class="btn-dias-previsao" data-dias="1">1 Dia</button>
+        </div>
 
         <div class="form-clima">
             <input type="text" id="cidadeInput" placeholder="Digite o nome da cidade">

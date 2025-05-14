@@ -657,6 +657,52 @@ button:disabled {
     margin-bottom: 20px;
 }
 
+/* NOVO: Estilos para os controles de seleção de dias da previsão */
+.controles-previsao-dias {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px; /* Espaço antes do formulário de cidade */
+    margin-top: -10px; /* Ajuste para ficar mais próximo do título h2 */
+}
+
+.controles-previsao-dias label {
+    font-weight: 500;
+    color: #333;
+    font-size: 0.95em;
+}
+
+.btn-dias-previsao {
+    padding: 7px 14px;
+    background-color: #f0f0f0; /* Cinza claro */
+    color: #333;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9em;
+    transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+.btn-dias-previsao:hover {
+    background-color: #e0e0e0;
+    border-color: #bbb;
+}
+
+.btn-dias-previsao.ativo {
+    background-color: #0288d1; /* Azul (mesmo do botão "Ver Previsão") */
+    color: white;
+    border-color: #0277bd;
+    font-weight: bold;
+}
+
+/* Ajuste para o título da previsão se necessário */
+#tituloPrevisaoTempo {
+    /* Seus estilos existentes para h2 devem funcionar bem.
+       Se precisar de algo específico, adicione aqui. */
+}
+
+
 .form-clima {
     display: flex;
     gap: 10px;
@@ -720,12 +766,13 @@ button:disabled {
 #previsaoTempoResultado {
     margin-top: 20px;
 }
-#previsaoTempoResultado h3 {
+/* O H3 interno não é mais usado, pois o H2 principal é atualizado */
+/* #previsaoTempoResultado h3 {
     text-align: center;
-    color: #01579b; /* Azul escuro */
+    color: #01579b; 
     margin-bottom: 15px;
     font-size: 1.3em;
-}
+} */
 #previsaoTempoResultado p { /* Estilo para mensagens de "sem previsão", "carregando" */
     text-align: center;
     font-style: italic;
