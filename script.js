@@ -1066,12 +1066,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // --- INÍCIO DA SEÇÃO DE PREVISÃO DO TEMPO ---
 
-// ATENÇÃO: ARMAZENAR A API KEY DIRETAMENTE NO CÓDIGO FRONTEND É INSEGURO!
-// Em uma aplicação real, a chave NUNCA deve ficar exposta aqui.
-// A forma correta envolve um backend (Node.js, Serverless) atuando como proxy.
-// Para FINS DIDÁTICOS nesta atividade, vamos usá-la aqui temporariamente.
-const apiKeyOpenWeather = "35d7762b577524cae23a447edf545f5c"; // <-- SUBSTITUA PELA SUA CHAVE REAL APENAS AQUI
-
 const cidadeInputElement = document.getElementById('cidadeInput');
 const verificarClimaBtnElement = document.getElementById('verificarClimaBtn');
 const previsaoTempoResultadoElement = document.getElementById('previsaoTempoResultado');
@@ -1139,34 +1133,50 @@ function exibirMensagemClima(mensagem, tipo = 'info') {
  * @throws {Error} Se a API Key não estiver configurada ou houver erro na API.
  */
 async function buscarPrevisaoDetalhada(cidade) {
-    console.log("[CLIMA DEBUG] Iniciando buscarPrevisaoDetalhada para:", cidade);
-    console.log("[CLIMA DEBUG] Verificando apiKeyOpenWeather no início da função:", `'${apiKeyOpenWeather}'`);
+// COLE ESTE BLOCO DE CÓDIGO DENTRO DA FUNÇÃO buscarPrevisaoDetalhada
 
-    if (typeof apiKeyOpenWeather !== 'string' || apiKeyOpenWeather.trim() === "" || apiKeyOpenWeather === "SUA_CHAVE_OPENWEATHERMAP_AQUI" || apiKeyOpenWeather.length < 32) {
-        console.error("[CLIMA ERRO] API Key da OpenWeatherMap não configurada corretamente ou inválida. Valor atual:", `'${apiKeyOpenWeather}'`, "Comprimento:", apiKeyOpenWeather.length);
-        exibirMensagemClima("Erro de configuração: API Key inválida ou não definida.", "erro");
-        throw new Error("API Key inválida ou não definida.");
-    }
+    console.log("[Frontend] Iniciando buscarPrevisaoDetalhada para:", cidade);
+    
+    // A URL agora aponta para o seu servidor backend
+    // Atenção à porta! Deve ser a porta do seu server.js (3001 por padrão)
+    const backendUrl = `http://localhost:3001/api/previsao/${encodeURIComponent(cidade)}`;
+    console.log("[Frontend] URL do backend:", backendUrl);
 
-    const url = `https://api.openweathermap.org/data/2.5/forecast?q=${encodeURIComponent(cidade)}&appid=${apiKeyOpenWeather}&units=metric&lang=pt_br`;
-    console.log("[CLIMA DEBUG] URL da API de previsão:", url);
+    if (previsaoTempoResultadoElement) previsaoTempoResultadoElement.innerHTML = `<p class="carregando-clima">Carregando previsão para ${cidade}...</p>`;
+    if (climaMensagemStatusElement) climaMensagemStatusElement.style.display = 'none'; // Esconde mensagens antigas
+    if(verificarClimaBtnElement) verificarClimaBtnElement.disabled = true;
+    if(cidadeInputElement) cidadeInputElement.disabled = true;
+     // Atualiza o título para mostrar que está carregando para a cidade, com o número de dias já selecionado
+    atualizarTituloPrevisao(cidade, numDiasPrevisaoSelecionado);
+
 
     try {
-        const response = await fetch(url);
-        const data = await response.json(); // Tenta parsear para pegar mensagem de erro da API
+        const response = await fetch(backendUrl);
 
         if (!response.ok) {
-            const mensagemErroApi = data.message || `Erro HTTP ${response.status}`;
-            console.error(`[CLIMA ERRO] Erro ao buscar previsão (response.ok = false): ${mensagemErroApi}`, data);
-            throw new Error(`Falha na API: ${mensagemErroApi}`);
+            // Tenta pegar a mensagem de erro do JSON retornado pelo backend
+            const errorData = await response.json().catch(() => ({ error: `Erro HTTP ${response.status} do servidor.` }));
+            console.error(`[Frontend] Erro na resposta do backend: ${response.status}`, errorData);
+            throw new Error(errorData.error || `Erro ${response.status} ao buscar previsão no servidor.`);
         }
-        console.log("[CLIMA DEBUG] Dados brutos da API de previsão recebidos:", data);
-        return data;
+
+        const data = await response.json();
+        console.log("[Frontend] Dados da previsão recebidos do backend:", data);
+
+        // A lógica de processarDadosForecast e exibirPrevisaoDetalhada continua a mesma,
+        // pois o formato dos dados da OpenWeatherMap não mudou.
+        return data; // Retorna os dados brutos para serem processados externamente
+
     } catch (error) {
-        const mensagemFinalErro = (error instanceof Error && error.message) ? error.message : "Falha na comunicação com a API de previsão.";
-        console.error("[CLIMA ERRO] Falha na requisição da previsão (catch geral):", error);
-        throw new Error(mensagemFinalErro);
+        console.error("[Frontend] Erro ao buscar previsão via backend:", error);
+        // A exibição de mensagem de erro agora é feita no event listener do botão
+        throw error; // Relança o erro para ser tratado no event listener
+    } finally {
+         if(verificarClimaBtnElement) verificarClimaBtnElement.disabled = false;
+         if(cidadeInputElement) cidadeInputElement.disabled = false;
     }
+
+// FIM DO BLOCO A SER COLADO
 }
 
 /**
