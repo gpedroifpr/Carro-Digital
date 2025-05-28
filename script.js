@@ -1139,7 +1139,7 @@ async function buscarPrevisaoDetalhada(cidade) {
     
     // A URL agora aponta para o seu servidor backend
     // Atenção à porta! Deve ser a porta do seu server.js (3001 por padrão)
-    const backendUrl = `http://localhost:3001/api/previsao/${encodeURIComponent(cidade)}`;
+    const backendUrl = `https://carro-digital-pedro.onrender.com/api/previsao/${encodeURIComponent(cidade)}`;
     console.log("[Frontend] URL do backend:", backendUrl);
 
     if (previsaoTempoResultadoElement) previsaoTempoResultadoElement.innerHTML = `<p class="carregando-clima">Carregando previsão para ${cidade}...</p>`;
