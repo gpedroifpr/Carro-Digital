@@ -24,7 +24,7 @@ Utiliza um backend Node.js/Express para atuar como proxy para a API OpenWeatherM
     *   Na raiz do projeto, crie um arquivo chamado `.env`.
     *   Dentro dele, adicione sua chave da API OpenWeatherMap:
         ```
-        OPENWEATHER_API_KEY=SUA_CHAVE_OPENWEATHERMAP_AQUI
+        c83cde8e8cdeef60e91d4355f5672bec
         ```
     *   **Substitua `SUA_CHAVE_OPENWEATHERMAP_AQUI` pela sua chave real.**
 4.  **Instale as dependências do backend:**
