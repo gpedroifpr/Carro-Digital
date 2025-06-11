@@ -559,89 +559,6 @@ button:disabled {
 }
 
 
-/* Responsividade */
-@media (max-width: 768px) {
-  h1 { font-size: 1.8em; }
-  .container-principal {
-      flex-direction: column; /* Empilha as colunas */
-      padding: 10px;
-      gap: 15px;
-  }
-  .coluna-controles,
-  .coluna-manutencao {
-      min-width: calc(100% - 20px); /* Ocupa quase toda a largura */
-      margin: 0 10px;
-      padding: 15px;
-  }
-  #selecaoVeiculosContainer {
-      margin-left: 10px;
-      margin-right: 10px;
-      padding: 15px;
-  }
-  .veiculo-card {
-      width: 140px; /* Cards menores */
-      padding: 10px;
-  }
-  .botoes-acao {
-      gap: 6px; /* Menos espaço entre botões */
-  }
-  .botoes-acao button {
-      padding: 9px 10px; /* Menor padding */
-      font-size: 13px;
-      min-width: 80px; /* Menor largura mínima */
-  }
-  #formAgendamento input, #formAgendamento select, #formAgendamento textarea {
-      /* Mantém 100% width, padding já ajusta */
-      padding: 8px;
-  }
-  .controles-volume {
-      padding: 10px;
-  }
-  .controles-volume label { margin: 0 5px 0 10px; }
-  .controles-volume input[type="range"] { width: 100px; }
-  #mensagemStatus {
-      margin-left: 10px;
-      margin-right: 10px;
-  }
-  /* Ajuste para detalhes extras em telas menores */
-  #detalhesExtrasContainer { margin: 15px 0; }
-  .detalhes-extras-box { padding: 12px; }
-}
-
-@media (max-width: 480px) {
-   h1 { font-size: 1.5em; }
-   h2 { font-size: 1.2em; }
-   .veiculo-card {
-       width: calc(50% - 10px); /* Dois cards por linha */
-       margin-bottom: 10px;
-   }
-    /* Ajustar botões do card para caber melhor */
-    .veiculo-card button {
-        padding: 6px 8px;
-        font-size: 0.8em;
-        margin: 3px 2px 0 2px;
-    }
-    .btn-ver-detalhes { margin-left: 3px; }
-
-   .botoes-acao button {
-       min-width: 60px; /* Ainda menor se necessário */
-       font-size: 12px;
-   }
-   #formAgendamento button[type="submit"] {
-       width: 100%; /* Botão submit ocupa toda a largura */
-       padding: 12px;
-   }
-   .controles-volume label {
-       display: block; /* Labels em cima dos ranges */
-       margin: 5px 0 2px 0;
-       text-align: left;
-   }
-    .controles-volume input[type="range"] {
-       width: 100%;
-       margin-bottom: 10px;
-   }
-}
-
 /* --- ESTILOS PARA PREVISÃO DO TEMPO --- */
 .container-previsao-tempo {
     background-color: #fff;
@@ -840,8 +757,142 @@ button:disabled {
     margin-bottom: 0;
     min-height: 3em; /* Para alinhar cards com descrições de tamanhos diferentes */
 }
+/* --- FIM DOS ESTILOS PARA PREVISÃO DO TEMPO --- */
 
-/* Responsividade para os cards de clima */
+
+/* --- ESTILOS PARA GARAGEM INTELIGENTE --- */
+.container-inteligente {
+    background-color: #f8f9fa; /* Um cinza muito leve, quase branco */
+    padding: 20px;
+    margin: 20px;
+    border-radius: 8px;
+    border: 1px solid #e9ecef;
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.06);
+    text-align: center;
+}
+
+.container-inteligente h2 {
+    color: #4a148c; /* Roxo escuro */
+}
+
+.subtitulo-inteligente {
+    color: #6a7175;
+    max-width: 600px;
+    margin: -10px auto 20px auto; /* Margem negativa para aproximar do título */
+    font-size: 1em;
+}
+
+.botoes-inteligentes {
+    margin-bottom: 25px;
+}
+
+#carregarDicasBtn {
+    background-color: #673ab7; /* Roxo */
+    color: white;
+    border: none;
+    padding: 12px 25px;
+    font-size: 1em;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: background-color 0.2s ease, transform 0.2s ease;
+}
+#carregarDicasBtn:hover:not(:disabled) {
+    background-color: #512da8; /* Roxo mais escuro */
+    transform: translateY(-2px);
+}
+
+.conteudo-inteligente h3 {
+    text-align: left;
+    color: #4a148c;
+    border-bottom: 2px solid #e1bee7; /* Borda roxa clara */
+    padding-bottom: 5px;
+    margin-top: 25px;
+    margin-bottom: 15px;
+}
+.conteudo-inteligente p.loading-text {
+    font-style: italic;
+    color: #666;
+}
+
+/* Estilo para cards de Dicas e Viagens */
+.dica-card, .viagem-card {
+    background-color: #fff;
+    border-left: 5px solid #7e57c2; /* Borda roxa média */
+    padding: 15px;
+    margin-bottom: 10px;
+    text-align: left;
+    border-radius: 0 4px 4px 0;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+}
+.viagem-card {
+    border-left-color: #26a69a; /* Verde-água para viagens */
+}
+.viagem-card strong {
+    color: #00695c; /* Verde escuro para o título da viagem */
+    display: block;
+    font-size: 1.1em;
+    margin-bottom: 5px;
+}
+
+#dicasEspecificasContainer .dica-card {
+    border-left-color: #ffa726; /* Laranja para dicas específicas */
+}
+#dicasEspecificasContainer strong {
+    color: #f57c00;
+}
+/* --- FIM DOS ESTILOS PARA GARAGEM INTELIGENTE --- */
+
+
+/* Responsividade */
+@media (max-width: 768px) {
+  h1 { font-size: 1.8em; }
+  .container-principal {
+      flex-direction: column; /* Empilha as colunas */
+      padding: 10px;
+      gap: 15px;
+  }
+  .coluna-controles,
+  .coluna-manutencao {
+      min-width: calc(100% - 20px); /* Ocupa quase toda a largura */
+      margin: 0 10px;
+      padding: 15px;
+  }
+  #selecaoVeiculosContainer {
+      margin-left: 10px;
+      margin-right: 10px;
+      padding: 15px;
+  }
+  .veiculo-card {
+      width: 140px; /* Cards menores */
+      padding: 10px;
+  }
+  .botoes-acao {
+      gap: 6px; /* Menos espaço entre botões */
+  }
+  .botoes-acao button {
+      padding: 9px 10px; /* Menor padding */
+      font-size: 13px;
+      min-width: 80px; /* Menor largura mínima */
+  }
+  #formAgendamento input, #formAgendamento select, #formAgendamento textarea {
+      /* Mantém 100% width, padding já ajusta */
+      padding: 8px;
+  }
+  .controles-volume {
+      padding: 10px;
+  }
+  .controles-volume label { margin: 0 5px 0 10px; }
+  .controles-volume input[type="range"] { width: 100px; }
+  #mensagemStatus {
+      margin-left: 10px;
+      margin-right: 10px;
+  }
+  /* Ajuste para detalhes extras em telas menores */
+  #detalhesExtrasContainer { margin: 15px 0; }
+  .detalhes-extras-box { padding: 12px; }
+}
+
 @media (max-width: 600px) {
     .clima-cards-wrapper {
         flex-direction: column; /* Empilha os cards */
@@ -863,4 +914,36 @@ button:disabled {
     }
 }
 
-/* --- FIM DOS ESTILOS PARA PREVISÃO DO TEMPO --- */
+@media (max-width: 480px) {
+   h1 { font-size: 1.5em; }
+   h2 { font-size: 1.2em; }
+   .veiculo-card {
+       width: calc(50% - 10px); /* Dois cards por linha */
+       margin-bottom: 10px;
+   }
+    /* Ajustar botões do card para caber melhor */
+    .veiculo-card button {
+        padding: 6px 8px;
+        font-size: 0.8em;
+        margin: 3px 2px 0 2px;
+    }
+    .btn-ver-detalhes { margin-left: 3px; }
+
+   .botoes-acao button {
+       min-width: 60px; /* Ainda menor se necessário */
+       font-size: 12px;
+   }
+   #formAgendamento button[type="submit"] {
+       width: 100%; /* Botão submit ocupa toda a largura */
+       padding: 12px;
+   }
+   .controles-volume label {
+       display: block; /* Labels em cima dos ranges */
+       margin: 5px 0 2px 0;
+       text-align: left;
+   }
+    .controles-volume input[type="range"] {
+       width: 100%;
+       margin-bottom: 10px;
+   }
+}

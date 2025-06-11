@@ -1367,3 +1367,172 @@ if (botoesDiasPrevisao.length > 0) {
 }
 
 // --- FIM DA SEÇÃO DE PREVISÃO DO TEMPO ---
+
+// =======================================================
+// --- INÍCIO DA SEÇÃO GARAGEM INTELIGENTE ---
+// =======================================================
+
+document.addEventListener('DOMContentLoaded', () => {
+    // Definindo a URL do backend em um só lugar para reutilização
+    const backendUrl = 'https://carro-digital-pedro.onrender.com';
+
+    // Pegando referências aos novos elementos do HTML
+    const carregarDicasBtn = document.getElementById('carregarDicasBtn');
+    const dicasGeraisContainer = document.getElementById('dicasGeraisContainer');
+    const dicasEspecificasContainer = document.getElementById('dicasEspecificasContainer');
+    const viagensContainer = document.getElementById('viagensContainer');
+
+    // -------------------------------------------------------
+    // --- Funções de Fetch (buscar dados do backend) ---
+    // -------------------------------------------------------
+
+    async function buscarDicasGerais() {
+        try {
+            const response = await fetch(`${backendUrl}/api/dicas-manutencao`);
+            if (!response.ok) throw new Error('Falha ao buscar dicas gerais.');
+            return await response.json();
+        } catch (error) {
+            console.error("Erro em buscarDicasGerais:", error);
+            exibirErro(dicasGeraisContainer, 'Não foi possível carregar as dicas de manutenção.');
+            return []; // Retorna array vazio em caso de erro para não quebrar a aplicação
+        }
+    }
+
+    async function buscarViagensPopulares() {
+        try {
+            const response = await fetch(`${backendUrl}/api/viagens-populares`);
+            if (!response.ok) throw new Error('Falha ao buscar viagens.');
+            return await response.json();
+        } catch (error) {
+            console.error("Erro em buscarViagensPopulares:", error);
+            exibirErro(viagensContainer, 'Não foi possível carregar as sugestões de viagem.');
+            return [];
+        }
+    }
+
+    async function buscarDicasEspecificas(tipoVeiculo) {
+        if (!tipoVeiculo) return []; // Não faz a busca se não houver tipo de veículo
+        try {
+            // Converte o nome da classe JS (ex: CarroEsportivo) para minúsculas para a URL da API
+            const tipoParaApi = tipoVeiculo.toLowerCase(); 
+            const response = await fetch(`${backendUrl}/api/dicas-manutencao/${tipoParaApi}`);
+            if (!response.ok) throw new Error(`Falha ao buscar dicas para ${tipoVeiculo}.`);
+            return await response.json();
+        } catch (error) {
+            console.error(`Erro em buscarDicasEspecificas para ${tipoVeiculo}:`, error);
+            exibirErro(dicasEspecificasContainer, `Não foi possível carregar dicas para ${tipoVeiculo}.`);
+            return [];
+        }
+    }
+
+    // -------------------------------------------------------
+    // --- Funções de Display (exibir dados no HTML) ---
+    // -------------------------------------------------------
+
+    function exibirDicasGerais(dicas) {
+        if (!dicasGeraisContainer) return;
+        dicasGeraisContainer.innerHTML = ''; // Limpa o container antes de adicionar conteúdo
+        if (dicas.length === 0) return; // Não exibe o título se não houver dicas
+
+        let html = '<h3>Dicas Gerais de Manutenção</h3>';
+        dicas.forEach(item => {
+            html += `<div class="dica-card">${item.dica}</div>`;
+        });
+        dicasGeraisContainer.innerHTML = html;
+    }
+
+    function exibirViagens(viagens) {
+        if (!viagensContainer) return;
+        viagensContainer.innerHTML = '';
+        if (viagens.length === 0) return;
+
+        let html = '<h3>Sugestões de Viagem</h3>';
+        viagens.forEach(viagem => {
+            html += `
+                <div class="viagem-card">
+                    <strong>${viagem.destino}</strong>
+                    <p>${viagem.descricao}</p>
+                </div>
+            `;
+        });
+        viagensContainer.innerHTML = html;
+    }
+
+    function exibirDicasEspecificas(dicas, tipoVeiculo) {
+        if (!dicasEspecificasContainer) return;
+        dicasEspecificasContainer.innerHTML = ''; // Sempre limpa, mesmo que não haja dicas
+        if (dicas.length === 0) return;
+        
+        // Formata o nome do tipo de veículo para exibição (Ex: 'CarroEsportivo' vira 'Carro Esportivo')
+        const nomeTipoFormatado = tipoVeiculo.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase());
+
+        let html = `<h3>Dicas para seu <strong>${nomeTipoFormatado}</strong></h3>`;
+        dicas.forEach(item => {
+            html += `<div class="dica-card">${item.dica}</div>`;
+        });
+        dicasEspecificasContainer.innerHTML = html;
+    }
+
+    function exibirErro(container, mensagem) {
+        if (container) {
+            // Estilo de erro pode ser adicionado no CSS para .error-text
+            container.innerHTML = `<p class="error-text" style="color: red; font-style: italic;">${mensagem}</p>`;
+        }
+    }
+    
+    // -------------------------------------------------------
+    // --- Event Listeners (disparar as ações) ---
+    // -------------------------------------------------------
+    
+    if (carregarDicasBtn) {
+        carregarDicasBtn.addEventListener('click', async () => {
+            carregarDicasBtn.disabled = true;
+            carregarDicasBtn.textContent = 'Carregando...';
+            
+            // Mostra mensagens de "carregando" para o usuário
+            dicasGeraisContainer.innerHTML = '<p class="loading-text">Buscando dicas gerais...</p>';
+            viagensContainer.innerHTML = '<p class="loading-text">Buscando sugestões de viagem...</p>';
+            dicasEspecificasContainer.innerHTML = ''; // Limpa as dicas específicas
+
+            // Busca os dados de dicas gerais e viagens em paralelo para mais performance
+            const [dicas, viagens] = await Promise.all([
+                buscarDicasGerais(),
+                buscarViagensPopulares()
+            ]);
+
+            // Exibe os dados gerais e de viagens
+            exibirDicasGerais(dicas);
+            exibirViagens(viagens);
+
+            // Se um veículo já estiver selecionado, busca dicas para ele também
+            if (garagem.veiculoSelecionado) {
+                const tipo = garagem.veiculoSelecionado.constructor.name; // 'Carro', 'CarroEsportivo', 'Caminhao'
+                const dicasEsp = await buscarDicasEspecificas(tipo);
+                exibirDicasEspecificas(dicasEsp, tipo);
+            }
+
+            carregarDicasBtn.disabled = false;
+            carregarDicasBtn.textContent = 'Carregar Dicas e Viagens';
+        });
+    }
+
+    // Listener para o evento personalizado 'veiculoSelecionado'
+    // Este código "ouve" quando um veículo é selecionado em outra parte do código
+    document.body.addEventListener('veiculoSelecionado', async (event) => {
+        // Apenas busca dicas específicas se a seção de dicas já tiver sido carregada uma vez
+        if (dicasGeraisContainer && dicasGeraisContainer.children.length > 0) {
+            const veiculo = event.detail.veiculo;
+            if (veiculo) {
+                const tipo = veiculo.constructor.name;
+                const dicasEsp = await buscarDicasEspecificas(tipo);
+                exibirDicasEspecificas(dicasEsp, tipo);
+            } else {
+                dicasEspecificasContainer.innerHTML = ''; // Limpa as dicas se nenhum veículo for selecionado
+            }
+        }
+    });
+});
+
+// =======================================================
+// --- FIM DA SEÇÃO GARAGEM INTELIGENTE ---
+// =======================================================
