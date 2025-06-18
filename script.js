@@ -1536,3 +1536,121 @@ document.addEventListener('DOMContentLoaded', () => {
 // =======================================================
 // --- FIM DA SEÇÃO GARAGEM INTELIGENTE ---
 // =======================================================
+
+// =======================================================
+// --- INÍCIO DAS NOVAS SEÇÕES (FASE 3 DA ATIVIDADE) ---
+// Este bloco é adicionado ao final do script.js original
+// =======================================================
+
+document.addEventListener('DOMContentLoaded', () => {
+    // A URL do seu backend. Altere aqui para teste local ou produção.
+    const backendUrl = 'http://localhost:3001'; // <-- PARA TESTAR NO SEU COMPUTADOR
+    // const backendUrl = 'https://carro-digital-pedro.onrender.com'; // <-- PARA QUANDO ENVIAR PARA O RENDER
+
+    // --- Função para carregar os Veículos em Destaque ---
+    async function carregarVeiculosDestaque() {
+        const container = document.getElementById('cards-veiculos-destaque');
+        if (!container) return; // Não faz nada se o elemento não existir
+
+        try {
+            const response = await fetch(`${backendUrl}/api/garagem/veiculos-destaque`);
+            if (!response.ok) {
+                // Se a resposta da rede não for 'ok', lança um erro com a mensagem do backend
+                throw new Error('Falha ao carregar veículos destaque.');
+            }
+            const veiculos = await response.json();
+
+            container.innerHTML = ''; // Limpa a mensagem "Carregando..."
+            if (veiculos.length === 0) {
+                container.innerHTML = '<p>Nenhum veículo em destaque no momento.</p>';
+                return;
+            }
+
+            veiculos.forEach(veiculo => {
+                const card = document.createElement('div');
+                card.className = 'destaque-card';
+                card.innerHTML = `
+                    <img src="${veiculo.imagemUrl || 'img/default.png'}" alt="${veiculo.modelo}" onerror="this.onerror=null; this.src='img/default.png';">
+                    <h3>${veiculo.modelo} (${veiculo.ano})</h3>
+                    <p><strong>Destaque:</strong> ${veiculo.destaque}</p>
+                `;
+                container.appendChild(card);
+            });
+        } catch (error) {
+            console.error("Erro ao carregar VeiculosDestaque:", error);
+            container.innerHTML = `<p style="color:red;">Erro ao carregar destaques: ${error.message}</p>`;
+        }
+    }
+
+    // --- Função para carregar os Serviços da Garagem ---
+    async function carregarServicosGaragem() {
+        const container = document.getElementById('lista-servicos-oferecidos');
+        if (!container) return;
+
+        try {
+            const response = await fetch(`${backendUrl}/api/garagem/servicos-oferecidos`);
+            if (!response.ok) {
+                throw new Error('Falha ao carregar os serviços.');
+            }
+            const servicos = await response.json();
+
+            container.innerHTML = '';
+            if (servicos.length === 0) {
+                container.innerHTML = '<p>Nenhum serviço disponível no momento.</p>';
+                return;
+            }
+
+            servicos.forEach(servico => {
+                const item = document.createElement('div');
+                item.className = 'servico-item';
+                item.innerHTML = `
+                    <h3>${servico.nome}</h3>
+                    <p>${servico.descricao}</p>
+                    <span class="preco">Preço estimado: ${servico.precoEstimado}</span>
+                `;
+                container.appendChild(item);
+            });
+        } catch (error) {
+            console.error("Erro ao carregar ServicosGaragem:", error);
+            container.innerHTML = `<p style="color:red;">Erro ao carregar serviços: ${error.message}</p>`;
+        }
+    }
+
+    // --- Função para carregar as Ferramentas Essenciais ---
+    async function carregarFerramentasEssenciais() {
+        const container = document.getElementById('lista-ferramentas-essenciais');
+        if (!container) return;
+
+        try {
+            const response = await fetch(`${backendUrl}/api/garagem/ferramentas-essenciais`);
+            if (!response.ok) {
+                throw new Error('Falha ao carregar as ferramentas.');
+            }
+            const ferramentas = await response.json();
+
+            container.innerHTML = '';
+            if (ferramentas.length === 0) {
+                container.innerHTML = '<p>Nenhuma ferramenta para mostrar.</p>';
+                return;
+            }
+            
+            ferramentas.forEach(ferramenta => {
+                const item = document.createElement('div');
+                item.className = 'ferramenta-item';
+                item.innerHTML = `
+                    <h3>${ferramenta.nome}</h3>
+                    <p>${ferramenta.utilidade}</p>
+                `;
+                container.appendChild(item);
+            });
+        } catch (error) {
+            console.error("Erro ao carregar FerramentasEssenciais:", error);
+            container.innerHTML = `<p style="color:red;">Erro ao carregar ferramentas: ${error.message}</p>`;
+        }
+    }
+
+    // --- Chama todas as funções para carregar os dados quando a página for aberta ---
+    carregarVeiculosDestaque();
+    carregarServicosGaragem();
+    carregarFerramentasEssenciais();
+});
