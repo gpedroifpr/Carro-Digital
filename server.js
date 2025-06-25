@@ -37,7 +37,7 @@ const viagensPopulares = [
 const veiculosDestaque = [
     { id: 10, modelo: "Maverick Híbrido", ano: 2024, destaque: "Economia e Estilo", imagemUrl: "https://i.ytimg.com/vi/0yIyeWwnAFM/maxresdefault.jpg" },
     { id: 11, modelo: "Kombi Elétrica ID.Buzz", ano: 2025, destaque: "Nostalgia Eletrificada", imagemUrl: "https://www.portaldenoticias.net/wp-content/uploads/2022/06/betleehot6669.png" },
-    { id: 12, modelo: "Mustang Mach-E", ano: 2024, destaque: "O Futuro da Potência", imagemUrl: "https://www.ford.com.br/content/dam/Ford/website-assets/latam/br/nameplate/mustang-mach-e/2023/colorizer/azul-estoril/fbr-mustang-mach-e-azul-estoril-01.png.renditions.original.png" }
+    { id: 12, modelo: "Mustang Mach-E", ano: 2024, destaque: "O Futuro da Potência", imagemUrl: "https://i.ytimg.com/vi/MkUtKO1uWpQ/maxresdefault.jpg" }
 ];
 
 const servicosGaragem = [
