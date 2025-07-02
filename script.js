@@ -3,7 +3,7 @@
 // =======================================================
 // --- CONFIGURAÇÃO CENTRAL DA API ---
 // =======================================================
-const API_BASE_URL = 'http://localhost:3001'; 
+const API_BASE_URL = 'https://carro-digital-pedro.onrender.com'; 
 
 class Manutencao {
     constructor(data, tipo, custo, descricao = "") {
