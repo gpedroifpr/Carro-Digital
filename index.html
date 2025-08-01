@@ -136,6 +136,44 @@
         </div>
     </div> <!-- Fim do container-principal -->
 
+    <!-- index.html -->
+<!-- ... código anterior ... -->
+
+    <hr> <!-- Separador visual -->
+
+    <!-- ===== NOVA SEÇÃO: GERENCIAMENTO DE VEÍCULOS (BANCO DE DADOS) ===== -->
+    <section class="container-novos-dados" id="gerenciamento-veiculos-db">
+        <h2>Veículos da Garagem (Banco de Dados)</h2>
+        
+        <!-- Formulário para adicionar novos veículos -->
+        <div class="form-container-db">
+            <h3>Adicionar Novo Veículo</h3>
+            <form id="formAdicionarVeiculo">
+                <div class="form-row">
+                    <input type="text" id="veiculoPlaca" placeholder="Placa (ABC1D23)" required>
+                    <input type="text" id="veiculoMarca" placeholder="Marca (Ex: Ford)" required>
+                    <input type="text" id="veiculoModelo" placeholder="Modelo (Ex: Maverick)" required>
+                </div>
+                <div class="form-row">
+                    <input type="number" id="veiculoAno" placeholder="Ano (Ex: 2024)" required>
+                    <input type="text" id="veiculoCor" placeholder="Cor (Opcional)">
+                    <button type="submit">Salvar Veículo</button>
+                </div>
+            </form>
+            <div id="mensagemFormVeiculo" class="mensagem" style="display: none; margin-top: 10px;"></div>
+        </div>
+
+        <!-- Lista de veículos vindos do banco de dados -->
+        <h3>Veículos Registrados</h3>
+        <div id="lista-veiculos-db" class="lista-container-db">
+            <p>Carregando veículos do banco de dados...</p>
+        </div>
+    </section>
+    <!-- ======================================================================= -->
+
+    <hr> <!-- Separador visual -->
+<!-- ... resto do seu código ... -->
+
     <hr> <!-- Separador visual -->
 
     <!-- NOVA SEÇÃO: Previsão do Tempo -->

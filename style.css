@@ -1028,4 +1028,74 @@ button:disabled {
        width: 100%;
        margin-bottom: 10px;
    }
+   /* ----- NOVO: ESTILOS PARA GERENCIAMENTO DE VEÍCULOS (DB) ----- */
+.form-container-db {
+    background-color: #f8f9fa;
+    padding: 20px;
+    border-radius: 8px;
+    margin-bottom: 25px;
+    border: 1px solid #e9ecef;
+}
+.form-container-db h3 {
+    text-align: center;
+    margin-top: 0;
+    margin-bottom: 15px;
+    color: #3949ab;
+}
+#formAdicionarVeiculo .form-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+#formAdicionarVeiculo input {
+    flex-grow: 1;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    min-width: 150px;
+}
+#formAdicionarVeiculo button {
+    background-color: #3949ab;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: background-color 0.2s;
+}
+#formAdicionarVeiculo button:hover:not(:disabled) {
+    background-color: #283593;
+}
+.lista-container-db {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 15px;
+}
+.veiculo-db-card {
+    background: #fff;
+    border: 1px solid #e0e0e0;
+    border-left: 5px solid #3949ab;
+    padding: 15px;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+.veiculo-db-card h4 {
+    margin: 0 0 10px 0;
+    color: #1a237e;
+}
+.veiculo-db-card p {
+    margin: 4px 0;
+    font-size: 0.9em;
+}
+.veiculo-db-card .placa {
+    font-family: monospace;
+    font-weight: bold;
+    background-color: #eee;
+    padding: 2px 5px;
+    border-radius: 3px;
+    display: inline-block;
+}
+/* ----- FIM DOS NOVOS ESTILOS ----- */
 }

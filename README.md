@@ -46,3 +46,5 @@ Utiliza um backend Node.js/Express para atuar como proxy para a API OpenWeatherM
 ## Endpoint do Backend
 
 *   **`GET /api/previsao/:cidade`**: Retorna a previsão do tempo para a cidade especificada.
+
+MONGO_URI=mongodb+srv://matriquiz:PedroSamara123@matriquiz.e9rxjvj.mongodb.net/?retryWrites=true&w=majority&appName=matriquiz

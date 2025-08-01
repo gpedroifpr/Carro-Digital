@@ -3,7 +3,7 @@
 // =======================================================
 // --- CONFIGURAÇÃO CENTRAL DA API ---
 // =======================================================
-const API_BASE_URL = 'https://carro-digital-pedro.onrender.com'; 
+const API_BASE_URL = 'http://localhost:3001'; 
 
 class Manutencao {
     constructor(data, tipo, custo, descricao = "") {
@@ -820,8 +820,116 @@ async function carregarDadosAdicionais() {
     }
 }
 
+// ----- NOVO: Funções para interagir com a API de Veículos (CRUD) -----
+
+/**
+ * Busca todos os veículos da API e os exibe na tela.
+ */
+async function carregarEExibirVeiculos() {
+    const listaContainer = document.getElementById('lista-veiculos-db');
+    if (!listaContainer) return;
+
+    listaContainer.innerHTML = '<p>Carregando veículos...</p>';
+
+    try {
+        const response = await fetch(`${API_BASE_URL}/api/veiculos`);
+        if (!response.ok) {
+            const erro = await response.json();
+            throw new Error(erro.error || 'Falha ao buscar os veículos.');
+        }
+        const veiculos = await response.json();
+
+        if (veiculos.length === 0) {
+            listaContainer.innerHTML = '<p>Nenhum veículo cadastrado na garagem ainda.</p>';
+            return;
+        }
+
+        listaContainer.innerHTML = ''; 
+        // Ordena para mostrar os mais recentes primeiro
+        veiculos.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+        
+        veiculos.forEach(veiculo => {
+            const card = document.createElement('div');
+            card.className = 'veiculo-db-card';
+            card.innerHTML = `
+                <h4>${veiculo.marca} ${veiculo.modelo}</h4>
+                <p><strong>Placa:</strong> <span class="placa">${veiculo.placa}</span></p>
+                <p><strong>Ano:</strong> ${veiculo.ano}</p>
+                <p><strong>Cor:</strong> ${veiculo.cor || 'Não informada'}</p>
+                <p><small>Cadastrado em: ${new Date(veiculo.createdAt).toLocaleDateString('pt-BR')}</small></p>
+            `;
+            listaContainer.appendChild(card);
+        });
+
+    } catch (error) {
+        console.error("Erro ao carregar veículos:", error);
+        listaContainer.innerHTML = `<p style="color: red;">${error.message}</p>`;
+    }
+}
+
+/**
+ * Envia os dados de um novo veículo para a API.
+ */
+async function adicionarNovoVeiculo(evento) {
+    evento.preventDefault(); // Impede o recarregamento da página
+
+    const placa = document.getElementById('veiculoPlaca').value;
+    const marca = document.getElementById('veiculoMarca').value;
+    const modelo = document.getElementById('veiculoModelo').value;
+    const ano = document.getElementById('veiculoAno').value;
+    const cor = document.getElementById('veiculoCor').value;
+    const form = document.getElementById('formAdicionarVeiculo');
+    const mensagemDiv = document.getElementById('mensagemFormVeiculo');
+    const submitButton = form.querySelector('button[type="submit"]');
+    
+    submitButton.disabled = true;
+    submitButton.textContent = 'Salvando...';
+
+    try {
+        const response = await fetch(`${API_BASE_URL}/api/veiculos`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ placa, marca, modelo, ano, cor }),
+        });
+
+        const resultado = await response.json();
+
+        if (!response.ok) {
+            // Se a resposta não for OK, lança um erro com a mensagem da API
+            throw new Error(resultado.error || `Erro ${response.status}`);
+        }
+        
+        mensagemDiv.textContent = 'Veículo adicionado com sucesso!';
+        mensagemDiv.className = 'mensagem sucesso';
+        mensagemDiv.style.display = 'block';
+
+        form.reset(); // Limpa o formulário
+        await carregarEExibirVeiculos(); // ATUALIZA A LISTA NA TELA!
+
+    } catch (error) {
+        mensagemDiv.textContent = `Erro: ${error.message}`;
+        mensagemDiv.className = 'mensagem erro';
+        mensagemDiv.style.display = 'block';
+    } finally {
+        submitButton.disabled = false;
+        submitButton.textContent = 'Salvar Veículo';
+        // Esconde a mensagem após alguns segundos
+        setTimeout(() => { mensagemDiv.style.display = 'none'; }, 5000);
+    }
+}
+// ----- FIM DAS NOVAS FUNÇÕES -----
+
 // --- Inicialização e Event Listeners ---
 document.addEventListener('DOMContentLoaded', () => {
+    // ----- NOVO: Adiciona os listeners para os novos elementos -----
+    const formVeiculo = document.getElementById('formAdicionarVeiculo');
+    if (formVeiculo) {
+        formVeiculo.addEventListener('submit', adicionarNovoVeiculo);
+    }
+    
+    // Carrega os veículos do banco de dados assim que a página abre
+    carregarEExibirVeiculos();
+    // -----------------------------------------------------------
     carregarGaragem();
     carregarDadosAdicionais();
     garagem.atualizarDisplayGeral();
