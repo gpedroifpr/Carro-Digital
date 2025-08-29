@@ -6,7 +6,8 @@ import dotenv from 'dotenv';
 import axios from 'axios';
 import cors from 'cors';
 import mongoose from 'mongoose'; // <-- NOVO: Importa o Mongoose
-import Veiculo from './models/veiculo.js'; // <-- NOVO: Importa o nosso modelo
+import Veiculo from './models/veiculo.js'; 
+import Manutencao from './models/manutencao.js';
 
 // Carrega variáveis de ambiente
 dotenv.config();
@@ -101,6 +102,55 @@ app.post('/api/veiculos', async (req, res) => {
     }
 });
 // --- FIM DOS NOVOS ENDPOINTS CRUD ---
+// --- NOVOS ENDPOINTS PARA MANUTENÇÕES (SUB-RECURSO DE VEÍCULO) ---
+
+// Endpoint para CRIAR uma manutenção para um veículo específico
+app.post('/api/veiculos/:veiculoId/manutencoes', async (req, res) => {
+    try {
+        const { veiculoId } = req.params; // Pega o ID do veículo da URL
+
+        // 1. Verifica se o veículo realmente existe para evitar criar manutenções órfãs
+        const veiculoExiste = await Veiculo.findById(veiculoId);
+        if (!veiculoExiste) {
+            return res.status(404).json({ error: 'Veículo não encontrado.' });
+        }
+
+        // 2. Cria a nova manutenção, adicionando o ID do veículo ao corpo da requisição
+        const novaManutencao = await Manutencao.create({
+            ...req.body,       // Pega os dados do formulário (descrição, custo, etc.)
+            veiculo: veiculoId // Associa esta manutenção ao veículo encontrado
+        });
+
+        console.log(`[Servidor] Manutenção criada para o veículo ${veiculoId}`);
+        res.status(201).json(novaManutencao);
+
+    } catch (error) {
+        // Trata erros de validação (campos faltando, etc.)
+        if (error.name === 'ValidationError') {
+             const messages = Object.values(error.errors).map(val => val.message);
+             return res.status(400).json({ error: messages.join(' ') });
+        }
+        // Trata outros erros
+        res.status(500).json({ error: 'Erro interno ao criar manutenção.' });
+    }
+});
+
+// Endpoint para LISTAR todas as manutenções de um veículo específico
+app.get('/api/veiculos/:veiculoId/manutencoes', async (req, res) => {
+    try {
+        const { veiculoId } = req.params; // Pega o ID do veículo da URL
+
+        // Busca no banco todas as manutenções onde o campo 'veiculo' é igual ao ID da URL
+        const manutencoes = await Manutencao.find({ veiculo: veiculoId })
+                                           .sort({ data: -1 }); // Ordena pelas mais recentes primeiro
+
+        res.json(manutencoes);
+
+    } catch (error) {
+        res.status(500).json({ error: 'Erro interno ao buscar manutenções.' });
+    }
+});
+// --- FIM DO NOVO BLOCO DE CÓDIGO ---
 
 
 // Endpoint de Previsão do Tempo (MANTIDO)

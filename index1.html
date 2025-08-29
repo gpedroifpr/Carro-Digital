@@ -136,12 +136,16 @@
         </div>
     </div> <!-- Fim do container-principal -->
 
+    <!-- index.html -->
+<!-- ... código anterior ... -->
+
     <hr> <!-- Separador visual -->
 
-    <!-- ===== SEÇÃO: GERENCIAMENTO DE VEÍCULOS (BANCO DE DADOS) ===== -->
+    <!-- ===== NOVA SEÇÃO: GERENCIAMENTO DE VEÍCULOS (BANCO DE DADOS) ===== -->
     <section class="container-novos-dados" id="gerenciamento-veiculos-db">
         <h2>Veículos da Garagem (Banco de Dados)</h2>
         
+        <!-- Formulário para adicionar novos veículos -->
         <div class="form-container-db">
             <h3>Adicionar Novo Veículo</h3>
             <form id="formAdicionarVeiculo">
@@ -159,6 +163,7 @@
             <div id="mensagemFormVeiculo" class="mensagem" style="display: none; margin-top: 10px;"></div>
         </div>
 
+        <!-- Lista de veículos vindos do banco de dados -->
         <h3>Veículos Registrados</h3>
         <div id="lista-veiculos-db" class="lista-container-db">
             <p>Carregando veículos do banco de dados...</p>
@@ -167,16 +172,16 @@
     <!-- ======================================================================= -->
 
     <hr> <!-- Separador visual -->
-
-    <!-- ===== ESTA É A NOVA SEÇÃO PARA AS MANUTENÇÕES DO BANCO DE DADOS ===== -->
+       <!-- ===== COLE O NOVO CÓDIGO HTML A SEGUIR AQUI ===== -->
     <section id="gerenciamento-manutencoes-db" class="container-novos-dados" style="display: none;">
-        <!-- O título será preenchido pelo JS -->
+        <!-- O título será preenchido pelo JS para mostrar de qual carro são as manutenções -->
         <h2>Manutenções para <span id="manutencao-veiculo-selecionado-titulo">...</span></h2>
         
-        <!-- Este é o NOVO formulário que a atividade pede -->
+        <!-- Formulário para adicionar nova manutenção -->
         <div class="form-container-db">
             <h3>Registrar Nova Manutenção</h3>
             <form id="formAdicionarManutencao">
+                <!-- Campo oculto para guardar o ID do veículo que estamos editando -->
                 <input type="hidden" id="manutencaoVeiculoId">
 
                 <div class="form-row">
@@ -192,7 +197,7 @@
             <div id="mensagemFormManutencao" class="mensagem" style="display: none; margin-top: 10px;"></div>
         </div>
 
-        <!-- Esta é a NOVA lista que a atividade pede -->
+        <!-- Lista de manutenções vindas do banco de dados -->
         <h3>Histórico de Manutenções</h3>
         <div id="lista-manutencoes-db" class="lista-container-db">
             <p>Selecione um veículo e clique em "Ver Manutenções" para carregar o histórico.</p>
@@ -200,10 +205,11 @@
     </section>
     <!-- ======================================================================= -->
     
-    <hr> <!-- O resto do seu código continua normalmente -->
+    <hr> <!-- Separador visual -->
 
-    <!-- ... (resto do seu código: Previsão do Tempo, Garagem Inteligente, etc.) ... -->
-         <!-- ======================================================================= -->
+<!-- ... resto do seu código ... -->
+
+    <hr> <!-- Separador visual -->
 
     <!-- NOVA SEÇÃO: Previsão do Tempo -->
     <div class="container-previsao-tempo">
@@ -293,6 +299,5 @@
 
     <!-- Script JS no final -->
     <script src="script.js"></script>
-
 </body>
 </html>
