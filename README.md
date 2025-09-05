@@ -24,6 +24,7 @@ Utiliza um backend Node.js/Express para atuar como proxy para a API OpenWeatherM
     *   Na raiz do projeto, crie um arquivo chamado `.env`.
     *   Dentro dele, adicione sua chave da API OpenWeatherMap:
         ```
+        MONGO_URI=mongodb+srv://matriquiz:PedroSamara123@matriquiz.e9rxjvj.mongodb.net/?retryWrites=true&w=majority&appName=matriquiz
         OPENWEATHER_API_KEY=dda597bae6f39668bd0f837710a9b86e
         ```
 4.  **Instale as dependências do backend:**
@@ -46,7 +47,3 @@ Utiliza um backend Node.js/Express para atuar como proxy para a API OpenWeatherM
 ## Endpoint do Backend
 
 *   **`GET /api/previsao/:cidade`**: Retorna a previsão do tempo para a cidade especificada.
-
-.env:
-MONGO_URI=mongodb+srv://matriquiz:PedroSamara123@matriquiz.e9rxjvj.mongodb.net/?retryWrites=true&w=majority&appName=matriquiz
-OPENWEATHER_API_KEY=dda597bae6f39668bd0f837710a9b86e
