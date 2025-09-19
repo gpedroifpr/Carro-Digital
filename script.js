@@ -1,4 +1,4 @@
-// script.js (VERSÃO COMPLETA COM GERENCIAMENTO DE MANUTENÇÃO DO BANCO DE DADOS)
+// script.js (VERSÃO FINAL E CORRIGIDA COM DELEÇÃO EM LOTES)
 
 // =======================================================
 // --- CONFIGURAÇÃO CENTRAL DA API ---
@@ -117,20 +117,18 @@ class Carro {
         this.exibirMensagem(`${this.modelo} desligado.`, 'info');
     }
 
-    acelerar() { // <- REMOVEMOS O PARÂMETRO 'incremento' DAQUI
+    acelerar() {
         if (!this.ligado) {
             this.exibirMensagem("O carro precisa estar ligado para acelerar.", 'erro');
             return;
         }
 
-        // ===== NOVA LÓGICA DE ACELERAÇÃO =====
-        let incremento = 10; // Aceleração padrão
+        let incremento = 10;
         if (this instanceof CarroEsportivo && this.turboAtivado) {
-            incremento = 70; // Aceleração com TURBO! É bem mais forte.
+            incremento = 70;
             this.exibirMensagem("BOOST! Turbo consumido!", 'sucesso');
-            this.desativarTurbo(); // Turbo é consumido após o uso
+            this.desativarTurbo();
         }
-        // ===================================
 
         const velMaxima = this.maxVelocidadeDisplay;
         if (this.velocidade >= velMaxima) {
@@ -148,7 +146,7 @@ class Carro {
         }
     }
 
-    frear() { // <- REMOVEMOS O PARÂMETRO 'decremento'
+    frear() {
         if (this.velocidade === 0) {
              if (!this.somAcelerando.paused) {
                 this.somAcelerando.pause();
@@ -157,7 +155,7 @@ class Carro {
              }
             return;
         }
-        const decremento = 15; // Valor fixo de frenagem
+        const decremento = 15;
         this.velocidade = Math.max(0, this.velocidade - decremento);
         this.atualizarDisplay();
         this.somFreio.play().catch(e => console.error("Erro ao tocar som freio:", e));
@@ -308,17 +306,14 @@ class CarroEsportivo extends Carro {
         this.somTurbo.volume = volumeRangeAceleracao ? parseFloat(volumeRangeAceleracao.value) * 0.8 : 0.4;
         this.somTurbo.play().catch(e => console.error("Erro ao tocar som turbo:", e));
         
-        // ===== LÓGICA DO TURBO ALTERADA =====
-        // NÃO acelera mais o carro, apenas "arma" o turbo
-        this.atualizarDisplay(); // Atualiza o status "Turbo: Ativado"
+        this.atualizarDisplay();
         this.exibirMensagem("Turbo armado! A próxima aceleração será potente.", 'sucesso');
-        // ===================================
     }
 
     desativarTurbo() {
         if (!this.turboAtivado) return;
         this.turboAtivado = false;
-        this.atualizarDisplay(); // Atualiza o status "Turbo: Desativado"
+        this.atualizarDisplay();
     }
 
     desligar() {
@@ -442,7 +437,7 @@ class Garagem {
                 case "acelerar": this.veiculoSelecionado.acelerar(); break;
                 case "frear": this.veiculoSelecionado.frear(); break;
                 case "buzinar": this.veiculoSelecionado.buzinar(); break;
-                case "ativarturbo": // Note que agora os IDs são minúsculos
+                case "ativarturbo":
                     if (this.veiculoSelecionado instanceof CarroEsportivo) this.veiculoSelecionado.ativarTurbo();
                     else this.veiculoSelecionado.exibirMensagem("Este veículo não tem turbo!", 'aviso');
                     break;
@@ -819,15 +814,10 @@ async function carregarDadosAdicionais() {
 
 // ----- Funções para interagir com a API de Veículos (CRUD) -----
 
-/**
- * Busca todos os veículos da API e os exibe na tela.
- */
 async function carregarEExibirVeiculos() {
     const listaContainer = document.getElementById('lista-veiculos-db');
     if (!listaContainer) return;
-
     listaContainer.innerHTML = '<p>Carregando veículos...</p>';
-
     try {
         const response = await fetch(`${API_BASE_URL}/api/veiculos`);
         if (!response.ok) {
@@ -835,20 +825,15 @@ async function carregarEExibirVeiculos() {
             throw new Error(erro.error || 'Falha ao buscar os veículos.');
         }
         const veiculos = await response.json();
-
         if (veiculos.length === 0) {
             listaContainer.innerHTML = '<p>Nenhum veículo cadastrado na garagem ainda.</p>';
             return;
         }
-
         listaContainer.innerHTML = ''; 
         veiculos.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-        
         veiculos.forEach(veiculo => {
             const card = document.createElement('div');
             card.className = 'veiculo-db-card';
-            
-            // ===== HTML DO CARD MODIFICADO PARA INCLUIR O NOVO BOTÃO =====
             card.innerHTML = `
                 <h4>${veiculo.marca} ${veiculo.modelo}</h4>
                 <p><strong>Placa:</strong> <span class="placa">${veiculo.placa}</span></p>
@@ -863,19 +848,14 @@ async function carregarEExibirVeiculos() {
             `;
             listaContainer.appendChild(card);
         });
-
     } catch (error) {
         console.error("Erro ao carregar veículos:", error);
         listaContainer.innerHTML = `<p style="color: red;">${error.message}</p>`;
     }
 }
 
-/**
- * Envia os dados de um novo veículo para a API.
- */
 async function adicionarNovoVeiculo(evento) {
     evento.preventDefault(); 
-
     const placa = document.getElementById('veiculoPlaca').value;
     const marca = document.getElementById('veiculoMarca').value;
     const modelo = document.getElementById('veiculoModelo').value;
@@ -884,30 +864,23 @@ async function adicionarNovoVeiculo(evento) {
     const form = document.getElementById('formAdicionarVeiculo');
     const mensagemDiv = document.getElementById('mensagemFormVeiculo');
     const submitButton = form.querySelector('button[type="submit"]');
-    
     submitButton.disabled = true;
     submitButton.textContent = 'Salvando...';
-
     try {
         const response = await fetch(`${API_BASE_URL}/api/veiculos`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ placa, marca, modelo, ano, cor }),
         });
-
         const resultado = await response.json();
-
         if (!response.ok) {
             throw new Error(resultado.error || `Erro ${response.status}`);
         }
-        
         mensagemDiv.textContent = 'Veículo adicionado com sucesso!';
         mensagemDiv.className = 'mensagem sucesso';
         mensagemDiv.style.display = 'block';
-
         form.reset(); 
         await carregarEExibirVeiculos(); 
-
     } catch (error) {
         mensagemDiv.textContent = `Erro: ${error.message}`;
         mensagemDiv.className = 'mensagem erro';
@@ -918,14 +891,7 @@ async function adicionarNovoVeiculo(evento) {
         setTimeout(() => { mensagemDiv.style.display = 'none'; }, 5000);
     }
 }
-// ----- FIM DAS FUNÇÕES ANTIGAS DE CRUD DE VEÍCULOS -----
 
-
-// ===== ESTE BLOCO INTEIRO É NOVO: FUNÇÕES PARA GERENCIAR MANUTENÇÕES DO BANCO DE DADOS =====
-/**
- * Busca as manutenções de um veículo específico e as exibe na tela.
- * @param {string} veiculoId O ID do veículo.
- */
 async function carregarManutencoes(veiculoId) {
     const listaContainer = document.getElementById('lista-manutencoes-db');
     if (!listaContainer) return;
@@ -941,7 +907,7 @@ async function carregarManutencoes(veiculoId) {
         listaContainer.innerHTML = '';
         manutencoes.forEach(m => {
             const item = document.createElement('div');
-            item.className = 'servico-item'; // Reutilizando um estilo que você já tem
+            item.className = 'servico-item';
             item.innerHTML = `
                 <h3>${m.descricaoServico}</h3>
                 <p>Data: <strong>${new Date(m.data).toLocaleDateString('pt-BR')}</strong></p>
@@ -955,11 +921,6 @@ async function carregarManutencoes(veiculoId) {
     }
 }
 
-/**
- * Mostra a seção de manutenções e carrega os dados do veículo selecionado.
- * @param {string} veiculoId O ID do veículo.
- * @param {string} veiculoNome O nome do veículo para exibir no título.
- */
 function exibirSecaoManutencoes(veiculoId, veiculoNome) {
     const secao = document.getElementById('gerenciamento-manutencoes-db');
     const titulo = document.getElementById('manutencao-veiculo-selecionado-titulo');
@@ -971,9 +932,6 @@ function exibirSecaoManutencoes(veiculoId, veiculoNome) {
     carregarManutencoes(veiculoId);
 }
 
-/**
- * Envia os dados de uma nova manutenção para a API.
- */
 async function adicionarNovaManutencao(evento) {
     evento.preventDefault();
     const form = document.getElementById('formAdicionarManutencao');
@@ -984,18 +942,11 @@ async function adicionarNovaManutencao(evento) {
     const data = document.getElementById('manutencaoDataServico').value;
     const custo = document.getElementById('manutencaoCustoServico').value;
     const quilometragem = document.getElementById('manutencaoKmServico').value;
-    if (!veiculoId) {
-        alert("Erro: ID do veículo não encontrado. Tente selecionar o veículo novamente.");
-        return;
-    }
-
+    if (!veiculoId) return alert("Erro: ID do veículo não encontrado.");
     submitButton.disabled = true;
     submitButton.textContent = 'Registrando...';
     const dadosManutencao = { descricaoServico, data, custo };
-    if (quilometragem) {
-        dadosManutencao.quilometragem = quilometragem;
-    }
-
+    if (quilometragem) dadosManutencao.quilometragem = quilometragem;
     try {
         const response = await fetch(`${API_BASE_URL}/api/veiculos/${veiculoId}/manutencoes`, {
             method: 'POST',
@@ -1003,58 +954,127 @@ async function adicionarNovaManutencao(evento) {
             body: JSON.stringify(dadosManutencao),
         });
         const resultado = await response.json();
-        if (!response.ok) {
-            throw new Error(resultado.error || `Erro ${response.status}`);
-        }
-        
+        if (!response.ok) throw new Error(resultado.error || `Erro ${response.status}`);
         mensagemDiv.textContent = 'Manutenção registrada com sucesso!';
         mensagemDiv.className = 'mensagem sucesso';
-        mensagemDiv.style.display = 'block';
         form.reset();
         document.getElementById('manutencaoVeiculoId').value = veiculoId;
         await carregarManutencoes(veiculoId);
     } catch (error) {
         mensagemDiv.textContent = `Erro: ${error.message}`;
         mensagemDiv.className = 'mensagem erro';
-        mensagemDiv.style.display = 'block';
     } finally {
         submitButton.disabled = false;
         submitButton.textContent = 'Registrar Manutenção';
+        mensagemDiv.style.display = 'block';
         setTimeout(() => { mensagemDiv.style.display = 'none'; }, 5000);
     }
 }
-// ===== FIM DO NOVO BLOCO DE FUNÇÕES =====
+
+// =======================================================
+// --- FUNÇÃO DE DELEÇÃO EM MASSA (VERSÃO CORRIGIDA COM LOTES) ---
+// =======================================================
+async function deletarTodosVeiculos() {
+    if (!confirm("TEM CERTEZA ABSOLUTA?\n\nEsta ação é IRREVERSÍVEL e vai apagar TODOS os veículos do banco de dados.")) {
+        alert("Ação cancelada.");
+        return;
+    }
+
+    const botao = document.getElementById('btnDeletarTodos');
+    const mensagemDiv = document.getElementById('mensagemDelecao');
+    botao.disabled = true;
+    botao.textContent = 'INICIANDO...';
+    mensagemDiv.className = 'mensagem info';
+    mensagemDiv.textContent = 'Iniciando processo de limpeza...';
+    mensagemDiv.style.display = 'block';
+
+    try {
+        mensagemDiv.textContent = 'Buscando a lista completa de veículos...';
+        const response = await fetch(`${API_BASE_URL}/api/veiculos`);
+        if (!response.ok) throw new Error("Falha ao buscar a lista de veículos para deletar.");
+        
+        const veiculos = await response.json();
+        const idsParaDeletar = veiculos.map(v => v._id);
+        const total = idsParaDeletar.length;
+
+        if (total === 0) {
+            mensagemDiv.textContent = "O banco de dados já está vazio.";
+            return;
+        }
+
+        const TAMANHO_LOTE = 50; // Deleta de 50 em 50 para não sobrecarregar o servidor
+        let deletadosComSucesso = 0;
+        const totalLotes = Math.ceil(total / TAMANHO_LOTE);
+
+        for (let i = 0; i < total; i += TAMANHO_LOTE) {
+            const lote = idsParaDeletar.slice(i, i + TAMANHO_LOTE);
+            const loteAtual = (i / TAMANHO_LOTE) + 1;
+            
+            botao.textContent = `DELETANDO LOTE ${loteAtual}/${totalLotes}`;
+            mensagemDiv.textContent = `Progresso: ${deletadosComSucesso} de ${total} veículos deletados.`;
+
+            const promessasLote = lote.map(id =>
+                fetch(`${API_BASE_URL}/api/veiculos/${id}`, { method: 'DELETE' })
+            );
+
+            const resultadosLote = await Promise.allSettled(promessasLote);
+            
+            resultadosLote.forEach(res => {
+                if (res.status === 'fulfilled' && res.value.ok) {
+                    deletadosComSucesso++;
+                }
+            });
+        }
+
+        mensagemDiv.className = 'mensagem sucesso';
+        mensagemDiv.textContent = `Limpeza concluída! Total de veículos deletados: ${deletadosComSucesso} de ${total}.`;
+        
+        await carregarEExibirVeiculos();
+
+    } catch (error) {
+        mensagemDiv.textContent = `Erro crítico durante a operação: ${error.message}`;
+        mensagemDiv.className = 'mensagem erro';
+    } finally {
+        botao.disabled = false;
+        botao.textContent = 'DELETAR TODOS OS VEÍCULOS DO BANCO DE DADOS';
+    }
+}
 
 
 // --- Inicialização e Event Listeners ---
 document.addEventListener('DOMContentLoaded', () => {
+    // Formulário de adicionar Veículo (DB)
     const formVeiculo = document.getElementById('formAdicionarVeiculo');
     if (formVeiculo) {
         formVeiculo.addEventListener('submit', adicionarNovoVeiculo);
     }
     
-    // ===== CÓDIGO NOVO PARA CONECTAR OS BOTÕES E O NOVO FORMULÁRIO =====
+    // Lista de Veículos (DB) - Delegação de evento para botões de manutenção
     const listaVeiculosDB = document.getElementById('lista-veiculos-db');
     if (listaVeiculosDB) {
-        // Usa delegação de evento para ouvir cliques nos botões de manutenção
         listaVeiculosDB.addEventListener('click', (e) => {
             if (e.target && e.target.classList.contains('btn-manutencao')) {
-                const veiculoId = e.target.dataset.id;
-                const veiculoNome = e.target.dataset.nome;
-                exibirSecaoManutencoes(veiculoId, veiculoNome);
+                exibirSecaoManutencoes(e.target.dataset.id, e.target.dataset.nome);
             }
         });
     }
 
+    // Formulário de adicionar Manutenção (DB)
     const formManutencao = document.getElementById('formAdicionarManutencao');
     if(formManutencao) {
         formManutencao.addEventListener('submit', adicionarNovaManutencao);
     }
-    // ======================================================================
 
+    // Botão de Deleção em Massa
+    const btnDeletar = document.getElementById('btnDeletarTodos');
+    if (btnDeletar) {
+        btnDeletar.addEventListener('click', deletarTodosVeiculos);
+    }
+
+    // Carrega dados iniciais do DB
     carregarEExibirVeiculos();
     
-    // O resto do seu código original de inicialização continua abaixo
+    // --- Lógica da Garagem Local (não-DB) ---
     carregarGaragem();
     carregarDadosAdicionais();
     garagem.atualizarDisplayGeral();
@@ -1064,7 +1084,7 @@ document.addEventListener('DOMContentLoaded', () => {
         e.preventDefault();
         const id = document.getElementById('manutencaoVeiculo').value;
         const veiculo = garagem.veiculos.find(v => v.id === id);
-        if (!veiculo) { garagem.exibirMensagemGlobal("Selecione um veículo", "erro"); return; }
+        if (!veiculo) return garagem.exibirMensagemGlobal("Selecione um veículo", "erro");
         try {
             const manutencao = new Manutencao(
                 document.getElementById('manutencaoData').value,
@@ -1087,6 +1107,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    // --- Lógica da Previsão do Tempo ---
     previsaoUI.btn.addEventListener('click', () => buscarPrevisao(previsaoUI.cidadeInput.value.trim()));
     previsaoUI.cidadeInput.addEventListener('keypress', e => { if (e.key === 'Enter') previsaoUI.btn.click(); });
     document.querySelectorAll('.btn-dias-previsao').forEach(btn => {
@@ -1098,6 +1119,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
+    // --- Lógica da Garagem Inteligente ---
     document.getElementById('carregarDicasBtn').addEventListener('click', async (e) => {
         const btn = e.target;
         btn.disabled = true; btn.textContent = 'Carregando...';

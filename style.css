@@ -395,4 +395,41 @@ button:disabled {
    .controles-volume label { display: block; margin: 10px 0 5px 0; }
    .controles-volume input[type="range"] { width: 100%; }
    .lista-container-db { grid-template-columns: 1fr; }
+
+   /* ======================================================== */
+/* --- ESTILOS PARA A ÁREA DE RISCO --- */
+/* ======================================================== */
+#area-de-risco h2 {
+    color: #b71c1c; /* Vermelho escuro */
+}
+.danger-zone {
+    background-color: #ffebee; /* Fundo vermelho claro */
+    border: 2px dashed #c62828; /* Borda vermelha tracejada */
+    border-radius: 8px;
+    padding: 20px;
+    text-align: center;
+}
+.danger-zone p {
+    color: #444;
+    max-width: 600px;
+    margin: 0 auto 20px auto;
+}
+#btnDeletarTodos {
+    background-color: #d32f2f; /* Vermelho */
+    color: white;
+    border: none;
+    padding: 12px 25px;
+    font-size: 1em;
+    font-weight: bold;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+#btnDeletarTodos:hover:not(:disabled) {
+    background-color: #b71c1c; /* Vermelho mais escuro */
+}
+#btnDeletarTodos:disabled {
+    background-color: #e0e0e0 !important;
+    cursor: wait;
+}
 }

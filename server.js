@@ -1,11 +1,12 @@
-// server.js - VERSÃO COM MONGOOSE E ENDPOINTS CRUD
+// server.js - VERSÃO ORIGINAL COM PROTEÇÃO DE SEGURANÇA (RATE LIMIT)
 
 // Importações
 import express from 'express';
 import dotenv from 'dotenv';
 import axios from 'axios';
 import cors from 'cors';
-import mongoose from 'mongoose'; // <-- NOVO: Importa o Mongoose
+import mongoose from 'mongoose';
+import rateLimit from 'express-rate-limit'; // <-- 1. IMPORTAÇÃO DA SEGURANÇA
 import Veiculo from './models/veiculo.js'; 
 import Manutencao from './models/manutencao.js';
 
@@ -15,26 +16,49 @@ dotenv.config();
 // Inicializa o aplicativo Express
 const app = express();
 
-// --- NOVO: Conexão com o MongoDB Atlas ---
+// --- Conexão com o MongoDB Atlas ---
 const mongoUri = process.env.MONGO_URI;
 if (!mongoUri) {
     console.error("ERRO: A variável de ambiente MONGO_URI não está definida.");
-    process.exit(1); // Encerra o processo se a URI não estiver configurada
+    process.exit(1);
 }
-
 mongoose.connect(mongoUri)
   .then(() => console.log('[Servidor] Conectado com sucesso ao MongoDB Atlas!'))
   .catch(err => console.error('[Servidor] Erro ao conectar ao MongoDB:', err));
-// -----------------------------------------
 
 // Middlewares
 app.use(cors());
-app.use(express.json()); // <-- IMPORTANTE: Essencial para conseguir ler o `req.body` de requisições POST
+app.use(express.json());
+
+// =======================================================
+// --- 2. CONFIGURAÇÃO DA SEGURANÇA (RATE LIMIT) ---
+// =======================================================
+// REGRA GERAL: Protege toda a API contra ataques básicos.
+const apiLimiter = rateLimit({
+	windowMs: 15 * 60 * 1000, // 15 minutos
+	max: 200, // Permite 200 requisições a cada 15 minutos por IP
+	standardHeaders: true,
+	legacyHeaders: false,
+    message: { error: "Muitas requisições enviadas deste IP, por favor, tente novamente após 15 minutos." }
+});
+
+// REGRA RESTRITA: Protege especificamente contra spam de criação.
+const createLimiter = rateLimit({
+    windowMs: 60 * 60 * 1000, // 1 hora
+    max: 10, // Permite criar no máximo 10 itens por hora por IP
+    message: { error: "Você atingiu o limite de criação de itens, por favor, tente novamente mais tarde." },
+    standardHeaders: true,
+    legacyHeaders: false,
+});
+
+// APLICA O LIMITADOR GERAL A TODAS AS ROTAS
+app.use(apiLimiter);
+// =======================================================
 
 const port = process.env.PORT || 3001;
 const apiKey = process.env.OPENWEATHER_API_KEY;
 
-// Dados Mock (Mantidos para os endpoints que não usam o banco de dados ainda)
+// Dados Mock (Mantidos)
 const dicasManutencaoGerais = [
     { id: 1, dica: "Verifique o nível do óleo do motor a cada 1.000km ou antes de viagens longas." },
     { id: 2, dica: "Calibre os pneus semanalmente, seguindo a pressão indicada no manual do veículo." }
@@ -65,32 +89,26 @@ const ferramentasEssenciais = [
     { id: "f03", nome: "Kit de Soquetes e Catraca", utilidade: "Versátil para a maioria dos parafusos e porcas do veículo." }
 ];
 
-
 // ----- ENDPOINTS DA API -----
 
-// --- ADICIONADO: NOVOS ENDPOINTS CRUD PARA VEÍCULOS ---
-
-// Endpoint: GET /api/veiculos (Ler todos os veículos do banco de dados)
+// Endpoint: GET /api/veiculos (Ler todos os veículos)
 app.get('/api/veiculos', async (req, res) => {
     try {
-        const todosOsVeiculos = await Veiculo.find(); // .find() sem argumentos busca todos
-        console.log('[Servidor] Buscando todos os veículos do DB.');
+        const todosOsVeiculos = await Veiculo.find().sort({ createdAt: -1 });
         res.json(todosOsVeiculos);
     } catch (error) {
-        console.error("[Servidor] Erro ao buscar veículos:", error);
         res.status(500).json({ error: 'Erro interno ao buscar veículos.' });
     }
 });
 
-// Endpoint: POST /api/veiculos (Criar um novo veículo no banco de dados)
-app.post('/api/veiculos', async (req, res) => {
+// Endpoint: POST /api/veiculos (Criar um novo veículo)
+// <-- 3. APLICAÇÃO DA SEGURANÇA EXTRA NESTA ROTA -->
+app.post('/api/veiculos', createLimiter, async (req, res) => {
     try {
         const novoVeiculoData = req.body;
         const veiculoCriado = await Veiculo.create(novoVeiculoData);
-        console.log('[Servidor] Veículo criado com sucesso:', veiculoCriado);
         res.status(201).json(veiculoCriado);
     } catch (error) {
-        console.error("[Servidor] Erro ao criar veículo:", error);
         if (error.code === 11000) {
             return res.status(409).json({ error: 'Veículo com esta placa já existe.' });
         }
@@ -101,59 +119,42 @@ app.post('/api/veiculos', async (req, res) => {
         res.status(500).json({ error: 'Erro interno ao criar veículo.' });
     }
 });
-// --- FIM DOS NOVOS ENDPOINTS CRUD ---
-// --- NOVOS ENDPOINTS PARA MANUTENÇÕES (SUB-RECURSO DE VEÍCULO) ---
 
-// Endpoint para CRIAR uma manutenção para um veículo específico
-app.post('/api/veiculos/:veiculoId/manutencoes', async (req, res) => {
+// Endpoint para CRIAR uma manutenção para um veículo
+// <-- 3. APLICAÇÃO DA SEGURANÇA EXTRA NESTA ROTA TAMBÉM -->
+app.post('/api/veiculos/:veiculoId/manutencoes', createLimiter, async (req, res) => {
     try {
-        const { veiculoId } = req.params; // Pega o ID do veículo da URL
-
-        // 1. Verifica se o veículo realmente existe para evitar criar manutenções órfãs
+        const { veiculoId } = req.params;
         const veiculoExiste = await Veiculo.findById(veiculoId);
         if (!veiculoExiste) {
             return res.status(404).json({ error: 'Veículo não encontrado.' });
         }
-
-        // 2. Cria a nova manutenção, adicionando o ID do veículo ao corpo da requisição
         const novaManutencao = await Manutencao.create({
-            ...req.body,       // Pega os dados do formulário (descrição, custo, etc.)
-            veiculo: veiculoId // Associa esta manutenção ao veículo encontrado
+            ...req.body,
+            veiculo: veiculoId
         });
-
-        console.log(`[Servidor] Manutenção criada para o veículo ${veiculoId}`);
         res.status(201).json(novaManutencao);
-
     } catch (error) {
-        // Trata erros de validação (campos faltando, etc.)
         if (error.name === 'ValidationError') {
              const messages = Object.values(error.errors).map(val => val.message);
              return res.status(400).json({ error: messages.join(' ') });
         }
-        // Trata outros erros
         res.status(500).json({ error: 'Erro interno ao criar manutenção.' });
     }
 });
 
-// Endpoint para LISTAR todas as manutenções de um veículo específico
+// Endpoint para LISTAR todas as manutenções de um veículo
 app.get('/api/veiculos/:veiculoId/manutencoes', async (req, res) => {
     try {
-        const { veiculoId } = req.params; // Pega o ID do veículo da URL
-
-        // Busca no banco todas as manutenções onde o campo 'veiculo' é igual ao ID da URL
-        const manutencoes = await Manutencao.find({ veiculo: veiculoId })
-                                           .sort({ data: -1 }); // Ordena pelas mais recentes primeiro
-
+        const { veiculoId } = req.params;
+        const manutencoes = await Manutencao.find({ veiculo: veiculoId }).sort({ data: -1 });
         res.json(manutencoes);
-
     } catch (error) {
         res.status(500).json({ error: 'Erro interno ao buscar manutenções.' });
     }
 });
-// --- FIM DO NOVO BLOCO DE CÓDIGO ---
 
-
-// Endpoint de Previsão do Tempo (MANTIDO)
+// Endpoint de Previsão do Tempo
 app.get('/api/previsao/:cidade', async (req, res) => {
     const { cidade } = req.params;
     const weatherAPIUrl = `https://api.openweathermap.org/data/2.5/forecast?q=${encodeURIComponent(cidade)}&appid=${apiKey}&units=metric&lang=pt_br`;
@@ -166,7 +167,7 @@ app.get('/api/previsao/:cidade', async (req, res) => {
     }
 });
 
-// Outros endpoints (Dicas, Viagens, Destaques, etc.) (TODOS MANTIDOS)
+// Outros endpoints (Dicas, Viagens, Destaques, etc.)
 app.get('/api/dicas-manutencao', (req, res) => res.json(dicasManutencaoGerais));
 app.get('/api/dicas-manutencao/:tipoVeiculo', (req, res) => res.json(dicasPorTipo[req.params.tipoVeiculo.toLowerCase()] || []));
 app.get('/api/viagens-populares', (req, res) => res.json(viagensPopulares));
@@ -179,12 +180,12 @@ app.get('/api/garagem/servicos-oferecidos/:idServico', (req, res) => {
     else res.status(404).json({ error: 'Serviço não encontrado.' });
 });
 
-// Rota Raiz (MANTIDA)
+// Rota Raiz
 app.get('/', (req, res) => {
     res.send('Servidor Garagem Virtual com CORS, Mongoose e CRUD de Veículos!');
 });
 
-// Inicia o servidor (MANTIDO)
+// Inicia o servidor
 app.listen(port, () => {
     console.log(`Servidor backend rodando na porta ${port}`);
 });
