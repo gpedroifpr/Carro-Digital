@@ -8,6 +8,45 @@
 <body>
     <h1>Garagem Virtual</h1>
 
+    <!-- ===== SEÇÃO DE AUTENTICAÇÃO (FORA DO MAIN CONTENT) ===== -->
+    <section id="auth-section" class="container-novos-dados">
+        <!-- Informações do Usuário Logado (inicialmente oculto) -->
+        <div id="user-info" style="display: none;">
+            <p>Bem-vindo de volta! <span id="user-email-display"></span></p>
+            <button id="logout-btn">Sair</button>
+        </div>
+
+        <div id="auth-container">
+            <!-- Formulário de Login (inicialmente visível) -->
+            <div id="login-form-container">
+                <h2>Login</h2>
+                <form id="login-form" class="auth-form">
+                    <input type="email" id="login-email" placeholder="Seu e-mail" required>
+                    <input type="password" id="login-password" placeholder="Sua senha" required>
+                    <button type="submit">Entrar</button>
+                    <p>Não tem uma conta? <a href="#" id="show-register">Registre-se</a></p>
+                </form>
+            </div>
+
+            <!-- Formulário de Registro (inicialmente oculto) -->
+            <div id="register-form-container" style="display: none;">
+                <h2>Registro</h2>
+                <form id="register-form" class="auth-form">
+                    <input type="email" id="register-email" placeholder="Seu e-mail" required>
+                    <input type="password" id="register-password" placeholder="Crie uma senha" required>
+                    <button type="submit">Criar Conta</button>
+                    <p>Já tem uma conta? <a href="#" id="show-login">Faça Login</a></p>
+                </form>
+            </div>
+            <div id="auth-message" class="mensagem" style="display: none;"></div>
+        </div>
+    </section>
+
+    <!-- ===== CONTEÚDO PRINCIPAL (SÓ APARECE DEPOIS DO LOGIN) ===== -->
+    <main id="main-content" style="display: none;">
+        
+        <!-- Área de Mensagens Global da Garagem -->
+        <div id="mensagemStatus" class="mensagem" style="display: none;"></div>
     <!-- Área de Mensagens Global da Garagem -->
     <div id="mensagemStatus" class="mensagem" style="display: none;"></div>
 
