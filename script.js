@@ -94,6 +94,7 @@ function setupAuthSystem() {
             
             localStorage.setItem('token', data.token);
             localStorage.setItem('userEmail', data.email);
+            localStorage.setItem('userId', data.userId); // Salva o ID do usuário
             updateUIForLoggedInUser();
         } catch (error) {
             showAuthMessage(error.message, 'erro');
@@ -107,22 +108,20 @@ function setupAuthSystem() {
     window.handleLogout = function() {
         localStorage.removeItem('token');
         localStorage.removeItem('userEmail');
+        localStorage.removeItem('userId'); // Limpa o ID do usuário
         updateUIForLoggedOutUser();
         location.reload();
     }
 
     function updateUIForLoggedInUser() {
-        document.getElementById('auth-container').style.display = 'none';
+        document.getElementById('auth-section').style.display = 'none';
         userInfo.style.display = 'flex';
-        userInfo.style.justifyContent = 'center';
-        userInfo.style.alignItems = 'center';
-        document.getElementById('user-email-display').textContent = localStorage.getItem('userEmail');
         mainContent.style.display = 'block';
         carregarEExibirVeiculos();
     }
 
     function updateUIForLoggedOutUser() {
-        document.getElementById('auth-container').style.display = 'block';
+        document.getElementById('auth-section').style.display = 'block';
         userInfo.style.display = 'none';
         mainContent.style.display = 'none';
     }
@@ -160,7 +159,9 @@ async function carregarEExibirVeiculos() {
     listaContainer.innerHTML = '<p>Carregando seus veículos...</p>';
 
     const token = localStorage.getItem('token');
-    if (!token) {
+    const userId = localStorage.getItem('userId'); // Pega o ID do usuário logado
+
+    if (!token || !userId) {
         listaContainer.innerHTML = '<p>Faça login para ver seus veículos.</p>';
         return;
     }
@@ -185,15 +186,37 @@ async function carregarEExibirVeiculos() {
         veiculos.forEach(veiculo => {
             const card = document.createElement('div');
             card.className = 'veiculo-db-card';
+
+            const isOwner = veiculo.owner._id === userId; // Verifica se o usuário logado é o dono
+
+            let sharedInfoHTML = '';
+            let shareFormHTML = '';
+
+            if (isOwner) {
+                // Se eu sou o dono, mostro o formulário para compartilhar
+                shareFormHTML = `
+                    <form class="share-form" data-veiculo-id="${veiculo._id}">
+                        <input type="email" placeholder="E-mail para compartilhar" required />
+                        <button type="submit">Compartilhar</button>
+                    </form>
+                `;
+            } else {
+                // Se não sou o dono, mostro quem compartilhou comigo
+                sharedInfoHTML = `<p class="shared-by">Compartilhado por: <strong>${veiculo.owner.email}</strong></p>`;
+            }
+
             card.innerHTML = `
                 <h4>${veiculo.marca} ${veiculo.modelo}</h4>
+                ${sharedInfoHTML}
                 <p><strong>Placa:</strong> <span class="placa">${veiculo.placa}</span></p>
                 <p><strong>Ano:</strong> ${veiculo.ano}</p>
                 <p><strong>Cor:</strong> ${veiculo.cor || 'Não informada'}</p>
                 <div class="card-actions">
                     <button class="btn-manutencao" data-id="${veiculo._id}" data-nome="${veiculo.marca} ${veiculo.modelo}">Ver Manutenções</button>
-                    <button class="btn-deletar-veiculo" data-id="${veiculo._id}">Excluir</button>
-                </div>`;
+                    ${isOwner ? `<button class="btn-deletar-veiculo" data-id="${veiculo._id}">Excluir</button>` : ''}
+                </div>
+                ${shareFormHTML}
+                `;
             listaContainer.appendChild(card);
         });
     } catch (error) {
@@ -259,10 +282,45 @@ async function deletarVeiculo(veiculoId) {
     }
 }
 
+async function handleShareVehicle(e) {
+    e.preventDefault();
+    const form = e.target;
+    const veiculoId = form.dataset.veiculoId;
+    const emailInput = form.querySelector('input[type="email"]');
+    const email = emailInput.value;
+    const button = form.querySelector('button');
+
+    button.disabled = true;
+    button.textContent = '...';
+
+    try {
+        const response = await fetch(`${API_BASE_URL}/api/veiculos/${veiculoId}/share`, {
+            method: 'POST',
+            headers: getAuthHeaders(),
+            body: JSON.stringify({ email })
+        });
+
+        const result = await response.json();
+        if (!response.ok) {
+            throw new Error(result.error || 'Ocorreu um erro.');
+        }
+        
+        alert(result.message);
+        emailInput.value = ''; // Limpa o campo
+    } catch (error) {
+        alert(`Erro ao compartilhar: ${error.message}`);
+    } finally {
+        button.disabled = false;
+        button.textContent = 'Compartilhar';
+    }
+}
+
 
 // =======================================================
 // --- SEU CÓDIGO ORIGINAL (CLASSES, FUNÇÕES, ETC.) ---
 // =======================================================
+// ... (Todo o seu código de classes Carro, Caminhao, Garagem, Manutencao, etc. continua aqui, inalterado)
+// O código é muito longo para ser repetido, mas ele deve permanecer aqui.
 class Manutencao {
     constructor(data, tipo, custo, descricao = "") {
         if (!this.validar(data, tipo, custo)) {
@@ -1187,6 +1245,13 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             if (e.target.classList.contains('btn-manutencao')) {
                 exibirSecaoManutencoes(e.target.dataset.id, e.target.dataset.nome);
+            }
+        });
+
+        // Listener para o submit do formulário de compartilhamento
+        listaVeiculosDb.addEventListener('submit', (e) => {
+            if (e.target.classList.contains('share-form')) {
+                handleShareVehicle(e);
             }
         });
     }

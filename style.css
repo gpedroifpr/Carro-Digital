@@ -263,13 +263,23 @@ button:disabled {
 .veiculo-db-card .placa {
     font-family: monospace; font-weight: bold; background-color: #e8eaf6; color: #3949ab; padding: 3px 6px; border-radius: 4px;
 }
-.veiculo-db-card div {
-    margin-top: auto; padding-top: 15px;
+.veiculo-db-card .card-actions {
+    margin-top: auto;
+    padding-top: 15px;
+    display: flex;
+    gap: 10px;
+}
+.veiculo-db-card .card-actions button {
+    width: 100%;
 }
 .btn-manutencao {
-    width: 100%; padding: 10px 15px; background-color: #00897b; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: 500; text-transform: uppercase; font-size: 0.85em; transition: background-color 0.2s ease;
+    padding: 10px 15px; background-color: #00897b; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: 500; text-transform: uppercase; font-size: 0.85em; transition: background-color 0.2s ease;
 }
 .btn-manutencao:hover { background-color: #00695c; }
+.btn-deletar-veiculo {
+    padding: 10px 15px; background-color: #c62828; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: 500; font-size: 0.85em; transition: background-color 0.2s ease;
+}
+.btn-deletar-veiculo:hover { background-color: #b71c1c; }
 
 
 /* ======================================================== */
@@ -397,40 +407,208 @@ button:disabled {
    .lista-container-db { grid-template-columns: 1fr; }
 
    /* ======================================================== */
-/* --- ESTILOS PARA A ÁREA DE RISCO --- */
-/* ======================================================== */
-#area-de-risco h2 {
-    color: #b71c1c; /* Vermelho escuro */
-}
-.danger-zone {
-    background-color: #ffebee; /* Fundo vermelho claro */
-    border: 2px dashed #c62828; /* Borda vermelha tracejada */
-    border-radius: 8px;
-    padding: 20px;
-    text-align: center;
-}
-.danger-zone p {
-    color: #444;
-    max-width: 600px;
-    margin: 0 auto 20px auto;
-}
-#btnDeletarTodos {
-    background-color: #d32f2f; /* Vermelho */
-    color: white;
-    border: none;
-    padding: 12px 25px;
-    font-size: 1em;
-    font-weight: bold;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.2s ease;
-}
-#btnDeletarTodos:hover:not(:disabled) {
-    background-color: #b71c1c; /* Vermelho mais escuro */
-}
-#btnDeletarTodos:disabled {
-    background-color: #e0e0e0 !important;
-    cursor: wait;
+   /* --- ESTILOS PARA A ÁREA DE RISCO --- */
+   /* ======================================================== */
+   #area-de-risco h2 {
+       color: #b71c1c; /* Vermelho escuro */
+   }
+   .danger-zone {
+       background-color: #ffebee; /* Fundo vermelho claro */
+       border: 2px dashed #c62828; /* Borda vermelha tracejada */
+       border-radius: 8px;
+       padding: 20px;
+       text-align: center;
+   }
+   .danger-zone p {
+       color: #444;
+       max-width: 600px;
+       margin: 0 auto 20px auto;
+   }
+   #btnDeletarTodos {
+       background-color: #d32f2f; /* Vermelho */
+       color: white;
+       border: none;
+       padding: 12px 25px;
+       font-size: 1em;
+       font-weight: bold;
+       border-radius: 5px;
+       cursor: pointer;
+       transition: background-color 0.2s ease;
+   }
+   #btnDeletarTodos:hover:not(:disabled) {
+       background-color: #b71c1c; /* Vermelho mais escuro */
+   }
+   #btnDeletarTodos:disabled {
+       background-color: #e0e0e0 !important;
+       cursor: wait;
+   }
 }
 
+/* ================================================= */
+/* --- ESTILOS PARA AUTENTICAÇÃO (LOGIN/REGISTRO) --- */
+/* ================================================= */
+#auth-section {
+  max-width: 450px;
+  margin: 40px auto;
+  padding: 25px;
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e0e0e0;
+}
+
+#auth-section h2 {
+  color: #0d47a1;
+  margin-top: 0;
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #eee;
+  text-align: center;
+}
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.auth-form input[type="email"],
+.auth-form input[type="password"] {
+  width: 100%;
+  padding: 12px 15px;
+  font-size: 1em;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.auth-form input[type="email"]:focus,
+.auth-form input[type="password"]:focus {
+  border-color: #2962ff;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(41, 98, 255, 0.15);
+}
+
+.auth-form button {
+  padding: 12px 20px;
+  font-size: 1.05em;
+  font-weight: 500;
+  background-color: #2962ff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.auth-form button:hover {
+  background-color: #1a4db8;
+}
+
+.auth-form p {
+  text-align: center;
+  margin-top: 10px;
+  color: #555;
+}
+
+.auth-form p a {
+  color: #00796b;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.auth-form p a:hover {
+  text-decoration: underline;
+}
+
+/* ================================================= */
+/* --- ESTILOS DO CABEÇALHO / NAVBAR --- */
+/* ================================================= */
+.site-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 40px;
+  background-color: #f8f9fa;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.site-header h1 {
+  margin: 0;
+  font-size: 1.8em;
+  color: #0d47a1;
+  letter-spacing: 1px;
+}
+
+#user-info {
+  display: flex !important;
+  align-items: center;
+  gap: 15px;
+  background-color: transparent !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  max-width: none !important;
+}
+
+#user-info p {
+  margin: 0;
+  color: #555;
+  font-size: 0.9em;
+}
+
+#user-info #user-email-display {
+  font-weight: bold;
+  color: #333;
+}
+
+#logout-btn {
+    padding: 7px 14px;
+    font-size: 0.9em;
+    background-color: #d32f2f;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+#logout-btn:hover {
+    background-color: #b71c1c;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+/* Estilos para a funcionalidade de Compartilhamento */
+.shared-by {
+    font-size: 0.8em;
+    font-style: italic;
+    color: #00796b;
+    background-color: #e0f2f1;
+    padding: 5px;
+    border-radius: 4px;
+    margin-top: -5px;
+    margin-bottom: 10px;
+}
+
+.share-form {
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid #eee;
+    display: flex;
+    gap: 5px;
+}
+
+.share-form input {
+    flex-grow: 1;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.share-form button {
+    padding: 8px 12px;
+    background-color: #5c6bc0;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
 }

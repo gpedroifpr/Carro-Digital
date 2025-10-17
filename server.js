@@ -86,7 +86,13 @@ app.post('/api/auth/login', async (req, res) => {
 
 app.get('/api/veiculos', authMiddleware, async (req, res) => {
     try {
-        const veiculos = await Veiculo.find({ owner: req.userId }).sort({ createdAt: -1 });
+        const veiculos = await Veiculo.find({
+            $or: [
+                { owner: req.userId },       // Condição 1: Veículos que eu possuo
+                { sharedWith: req.userId }   // Condição 2: Veículos compartilhados comigo
+            ]
+        }).populate('owner', 'email').sort({ createdAt: -1 }); // .populate() busca o email do dono
+
         res.json(veiculos);
     } catch (error) {
         res.status(500).json({ error: 'Erro ao buscar veículos.' });
@@ -115,6 +121,51 @@ app.delete('/api/veiculos/:id', authMiddleware, async (req, res) => {
         res.json({ message: "Veículo deletado com sucesso." });
     } catch (err) {
         res.status(500).json({ error: "Erro ao deletar veículo." });
+    }
+});
+
+// ROTA PARA COMPARTILHAR UM VEÍCULO
+app.post('/api/veiculos/:veiculoId/share', authMiddleware, async (req, res) => {
+    try {
+        const { veiculoId } = req.params;
+        const { email } = req.body; // Email do usuário para compartilhar
+
+        if (!email) {
+            return res.status(400).json({ error: 'O e-mail do usuário é obrigatório.' });
+        }
+
+        // 1. Encontra o veículo e verifica se o usuário logado é o dono
+        const veiculo = await Veiculo.findById(veiculoId);
+        if (!veiculo) {
+            return res.status(404).json({ error: 'Veículo não encontrado.' });
+        }
+        if (veiculo.owner.toString() !== req.userId) {
+            return res.status(403).json({ error: 'Acesso negado. Você não é o proprietário deste veículo.' });
+        }
+
+        // 2. Encontra o usuário com quem compartilhar
+        const userToShareWith = await User.findOne({ email });
+        if (!userToShareWith) {
+            return res.status(404).json({ error: `Usuário com o e-mail '${email}' não encontrado.` });
+        }
+        
+        // Validação extra: Não permitir compartilhar consigo mesmo
+        if (userToShareWith._id.toString() === req.userId) {
+            return res.status(400).json({ error: 'Você não pode compartilhar um veículo consigo mesmo.' });
+        }
+
+        // 3. Adiciona o ID do usuário ao array 'sharedWith' se ele ainda não estiver lá
+        if (veiculo.sharedWith.includes(userToShareWith._id)) {
+            return res.status(409).json({ error: 'Este veículo já foi compartilhado com este usuário.' });
+        }
+
+        veiculo.sharedWith.push(userToShareWith._id);
+        await veiculo.save();
+
+        res.status(200).json({ message: `Veículo compartilhado com sucesso com ${email}!` });
+
+    } catch (error) {
+        res.status(500).json({ error: 'Erro interno ao compartilhar o veículo.' });
     }
 });
 

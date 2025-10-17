@@ -7,7 +7,11 @@ const veiculoSchema = new mongoose.Schema({
     modelo: { type: String, required: true },
     ano: { type: Number, required: true },
     cor: { type: String },
-    owner: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }
+    owner: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+    sharedWith: [{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User'
+    }]
 }, { timestamps: true });
 
 const Veiculo = mongoose.model('Veiculo', veiculoSchema);
