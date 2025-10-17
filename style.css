@@ -541,7 +541,7 @@ button:disabled {
 }
 
 #user-info {
-  display: flex !important;
+  display: flex; /* O !important foi removido daqui. Essa é a correção. */
   align-items: center;
   gap: 15px;
   background-color: transparent !important;
