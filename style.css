@@ -97,7 +97,7 @@ hr {
   background-color: #ffebee; color: #b71c1c; border-color: #e57373;
 }
 .mensagem.sucesso, #mensagemStatus.sucesso {
-  background-color: #e8f5e9; color: #1b5e20; border-color: #81c784;
+  background-color: #e8f5e9; color: #0e4b91; border-color: #81c784;
 }
 .mensagem.info, #mensagemStatus.info {
   background-color: #e3f2fd; color: #0d47a1; border-color: #64b5f6;
@@ -410,11 +410,11 @@ button:disabled {
    /* --- ESTILOS PARA A ÁREA DE RISCO --- */
    /* ======================================================== */
    #area-de-risco h2 {
-       color: #b71c1c; /* Vermelho escuro */
+       color: #b71c1c;
    }
    .danger-zone {
-       background-color: #ffebee; /* Fundo vermelho claro */
-       border: 2px dashed #c62828; /* Borda vermelha tracejada */
+       background-color: #ffebee;
+       border: 2px dashed #c62828;
        border-radius: 8px;
        padding: 20px;
        text-align: center;
@@ -425,7 +425,7 @@ button:disabled {
        margin: 0 auto 20px auto;
    }
    #btnDeletarTodos {
-       background-color: #d32f2f; /* Vermelho */
+       background-color: #d32f2f;
        color: white;
        border: none;
        padding: 12px 25px;
@@ -436,7 +436,7 @@ button:disabled {
        transition: background-color 0.2s ease;
    }
    #btnDeletarTodos:hover:not(:disabled) {
-       background-color: #b71c1c; /* Vermelho mais escuro */
+       background-color: #b71c1c;
    }
    #btnDeletarTodos:disabled {
        background-color: #e0e0e0 !important;
@@ -541,7 +541,7 @@ button:disabled {
 }
 
 #user-info {
-  display: flex; /* O !important foi removido daqui. Essa é a correção. */
+  display: flex;
   align-items: center;
   gap: 15px;
   background-color: transparent !important;
@@ -577,13 +577,15 @@ button:disabled {
     box-shadow: 0 2px 5px rgba(0,0,0,0.2);
 }
 
-/* Estilos para a funcionalidade de Compartilhamento */
+/* ========================================================= */
+/* --- ESTILOS PARA FUNCIONALIDADE DE COMPARTILHAMENTO --- */
+/* ========================================================= */
 .shared-by {
     font-size: 0.8em;
     font-style: italic;
     color: #00796b;
     background-color: #e0f2f1;
-    padding: 5px;
+    padding: 5px 8px;
     border-radius: 4px;
     margin-top: -5px;
     margin-bottom: 10px;
@@ -611,4 +613,45 @@ button:disabled {
     border: none;
     border-radius: 4px;
     cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+.share-form button:hover {
+    background-color: #3949ab;
+}
+
+.shared-list-title {
+    margin-top: 15px;
+    margin-bottom: 5px;
+    font-size: 0.9em;
+    color: #333;
+    text-align: left;
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.shared-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.shared-list li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.85em;
+    padding: 4px 0;
+}
+
+.btn-unshare {
+    background: none;
+    border: none;
+    color: #c62828;
+    cursor: pointer;
+    font-weight: bold;
+    padding: 2px 5px;
+    border-radius: 50%;
+}
+.btn-unshare:hover {
+    background-color: #ffebee;
 }

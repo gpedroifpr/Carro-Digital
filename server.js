@@ -36,7 +36,7 @@ app.use(express.json());
 
 // Segurança: Limitador de Requisições
 const apiLimiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 200, message: { error: "Muitas requisições, tente novamente em 15 minutos." } });
-const createLimiter = rateLimit({ windowMs: 60 * 60 * 1000, max: 10, message: { error: "Limite de criação de itens atingido, tente novamente mais tarde." } });
+const createLimiter = rateLimit({ windowMs: 60 * 60 * 1000, max: 20, message: { error: "Limite de criação de itens atingido, tente novamente mais tarde." } });
 app.use('/api/', apiLimiter);
 
 
@@ -56,7 +56,7 @@ app.post('/api/auth/register', async (req, res) => {
         const newUser = new User({ email, password: hashedPassword });
         await newUser.save();
         
-        res.status(201).json({ message: 'Usuário registrado com sucesso!' });
+        res.status(201).json({ message: 'Usuário registrado com sucesso! Você já pode fazer o login.' });
     } catch (error) {
         res.status(500).json({ error: 'Erro no servidor ao registrar usuário.' });
     }
@@ -73,7 +73,7 @@ app.post('/api/auth/login', async (req, res) => {
         
         const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
         
-        res.status(200).json({ token, userId: user._id, email: user.email });
+        res.status(200).json({ message: `Login bem-sucedido! Bem-vindo(a) de volta, ${user.email}.`, token, userId: user._id, email: user.email });
     } catch (error) {
         res.status(500).json({ error: 'Erro no servidor ao fazer login.' });
     }
@@ -88,10 +88,13 @@ app.get('/api/veiculos', authMiddleware, async (req, res) => {
     try {
         const veiculos = await Veiculo.find({
             $or: [
-                { owner: req.userId },       // Condição 1: Veículos que eu possuo
-                { sharedWith: req.userId }   // Condição 2: Veículos compartilhados comigo
+                { owner: req.userId },       // Veículos que eu possuo
+                { sharedWith: req.userId }   // Veículos compartilhados comigo
             ]
-        }).populate('owner', 'email').sort({ createdAt: -1 }); // .populate() busca o email do dono
+        })
+        .populate('owner', 'email') // Popula o dono
+        .populate('sharedWith', 'email') // Popula a lista de compartilhados
+        .sort({ createdAt: -1 });
 
         res.json(veiculos);
     } catch (error) {
@@ -128,36 +131,18 @@ app.delete('/api/veiculos/:id', authMiddleware, async (req, res) => {
 app.post('/api/veiculos/:veiculoId/share', authMiddleware, async (req, res) => {
     try {
         const { veiculoId } = req.params;
-        const { email } = req.body; // Email do usuário para compartilhar
+        const { email } = req.body;
 
-        if (!email) {
-            return res.status(400).json({ error: 'O e-mail do usuário é obrigatório.' });
-        }
+        if (!email) return res.status(400).json({ error: 'O e-mail do usuário é obrigatório.' });
 
-        // 1. Encontra o veículo e verifica se o usuário logado é o dono
         const veiculo = await Veiculo.findById(veiculoId);
-        if (!veiculo) {
-            return res.status(404).json({ error: 'Veículo não encontrado.' });
-        }
-        if (veiculo.owner.toString() !== req.userId) {
-            return res.status(403).json({ error: 'Acesso negado. Você não é o proprietário deste veículo.' });
-        }
+        if (!veiculo) return res.status(404).json({ error: 'Veículo não encontrado.' });
+        if (veiculo.owner.toString() !== req.userId) return res.status(403).json({ error: 'Acesso negado. Você não é o proprietário.' });
 
-        // 2. Encontra o usuário com quem compartilhar
         const userToShareWith = await User.findOne({ email });
-        if (!userToShareWith) {
-            return res.status(404).json({ error: `Usuário com o e-mail '${email}' não encontrado.` });
-        }
-        
-        // Validação extra: Não permitir compartilhar consigo mesmo
-        if (userToShareWith._id.toString() === req.userId) {
-            return res.status(400).json({ error: 'Você não pode compartilhar um veículo consigo mesmo.' });
-        }
-
-        // 3. Adiciona o ID do usuário ao array 'sharedWith' se ele ainda não estiver lá
-        if (veiculo.sharedWith.includes(userToShareWith._id)) {
-            return res.status(409).json({ error: 'Este veículo já foi compartilhado com este usuário.' });
-        }
+        if (!userToShareWith) return res.status(404).json({ error: `Usuário com o e-mail '${email}' não encontrado.` });
+        if (userToShareWith._id.toString() === req.userId) return res.status(400).json({ error: 'Você não pode compartilhar um veículo consigo mesmo.' });
+        if (veiculo.sharedWith.includes(userToShareWith._id)) return res.status(409).json({ error: 'Este veículo já foi compartilhado com este usuário.' });
 
         veiculo.sharedWith.push(userToShareWith._id);
         await veiculo.save();
@@ -166,6 +151,29 @@ app.post('/api/veiculos/:veiculoId/share', authMiddleware, async (req, res) => {
 
     } catch (error) {
         res.status(500).json({ error: 'Erro interno ao compartilhar o veículo.' });
+    }
+});
+
+// ROTA PARA REMOVER COMPARTILHAMENTO DE UM VEÍCULO
+app.post('/api/veiculos/:veiculoId/unshare', authMiddleware, async (req, res) => {
+    try {
+        const { veiculoId } = req.params;
+        const { userIdToRemove } = req.body;
+
+        if (!userIdToRemove) return res.status(400).json({ error: 'ID do usuário a ser removido é obrigatório.' });
+        
+        const veiculo = await Veiculo.findById(veiculoId);
+        if (!veiculo) return res.status(404).json({ error: 'Veículo não encontrado.' });
+        if (veiculo.owner.toString() !== req.userId) return res.status(403).json({ error: 'Acesso negado. Você não é o proprietário.' });
+
+        await Veiculo.updateOne(
+            { _id: veiculoId },
+            { $pull: { sharedWith: userIdToRemove } }
+        );
+
+        res.status(200).json({ message: 'Acesso do usuário removido com sucesso.' });
+    } catch (error) {
+        res.status(500).json({ error: 'Erro interno ao remover compartilhamento.' });
     }
 });
 
@@ -209,7 +217,7 @@ app.get('/api/veiculos/:veiculoId/manutencoes', authMiddleware, async (req, res)
 const port = process.env.PORT || 3001;
 const apiKey = process.env.OPENWEATHER_API_KEY;
 
-// Dados Mock
+// Dados Mock...
 const dicasManutencaoGerais = [
     { id: 1, dica: "Verifique o nível do óleo do motor a cada 1.000km ou antes de viagens longas." },
     { id: 2, dica: "Calibre os pneus semanalmente, seguindo a pressão indicada no manual do veículo." }
