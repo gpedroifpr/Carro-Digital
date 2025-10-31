@@ -1,9 +1,10 @@
-// script.js (VERSÃO FINAL COMPLETA COM FEEDBACK E GERENCIAMENTO DE COMPARTILHAMENTO)
+// script.js (VERSÃO ATUALIZADA COM UPLOAD DE IMAGEM)
 
 // =======================================================
 // --- CONFIGURAÇÃO CENTRAL DA API ---
 // =======================================================
-const API_BASE_URL = 'https://carro-digital-pedro.onrender.com';
+// Mude para a URL do seu servidor Render quando for para produção
+const API_BASE_URL = 'http://localhost:3001'; 
 
 // =======================================================
 // --- FUNÇÃO GLOBAL DE FEEDBACK ---
@@ -18,7 +19,6 @@ function showGlobalMessage(message, type = 'info') {
     messageElement.className = `mensagem ${type}`;
     messageElement.style.display = 'block';
 
-    // Limpa a mensagem após um tempo
     setTimeout(() => {
         if (messageElement.textContent === message) {
             messageElement.style.display = 'none';
@@ -164,15 +164,17 @@ function setupAuthSystem() {
 // =======================================================
 // --- FUNÇÕES DE API (VEÍCULOS E COMPARTILHAMENTO) ---
 // =======================================================
-function getAuthHeaders() {
+// MODIFICADO: para lidar com FormData
+function getAuthHeaders(isFormData = false) {
     const token = localStorage.getItem('token');
-    const headers = { 'Content-Type': 'application/json' };
+    const headers = isFormData ? {} : { 'Content-Type': 'application/json' };
     if (token) {
         headers['Authorization'] = `Bearer ${token}`;
     }
     return headers;
 }
 
+// MODIFICADO: para exibir a imagem
 async function carregarEExibirVeiculos() {
     const listaContainer = document.getElementById('lista-veiculos-db');
     if (!listaContainer) return;
@@ -208,6 +210,9 @@ async function carregarEExibirVeiculos() {
             card.className = 'veiculo-db-card';
             const isOwner = veiculo.owner._id === userId;
 
+            const imageUrl = veiculo.imageUrl ? `${API_BASE_URL}/${veiculo.imageUrl}` : 'img/default.png';
+            const imageHTML = `<img src="${imageUrl}" alt="Foto de ${veiculo.marca} ${veiculo.modelo}" style="width: 100%; height: 150px; object-fit: cover; border-radius: 4px; margin-bottom: 10px;" onerror="this.onerror=null; this.src='img/default.png';">`;
+
             let sharedInfoHTML = '';
             let shareFormHTML = '';
             let sharedWithListHTML = '';
@@ -231,6 +236,7 @@ async function carregarEExibirVeiculos() {
             }
 
             card.innerHTML = `
+                ${imageHTML}
                 <h4>${veiculo.marca} ${veiculo.modelo}</h4>
                 ${sharedInfoHTML}
                 <p><strong>Placa:</strong> <span class="placa">${veiculo.placa}</span></p>
@@ -250,26 +256,21 @@ async function carregarEExibirVeiculos() {
     }
 }
 
+// MODIFICADO: para usar FormData
 async function adicionarNovoVeiculo(e) {
     e.preventDefault();
     const form = e.target;
-    const button = form.querySelector('button');
+    const button = form.querySelector('button[type="submit"]');
     button.disabled = true;
     button.textContent = "Salvando...";
 
-    const veiculoData = {
-        placa: document.getElementById('veiculoPlaca').value,
-        marca: document.getElementById('veiculoMarca').value,
-        modelo: document.getElementById('veiculoModelo').value,
-        ano: document.getElementById('veiculoAno').value,
-        cor: document.getElementById('veiculoCor').value,
-    };
+    const formData = new FormData(form);
 
     try {
         const response = await fetch(`${API_BASE_URL}/api/veiculos`, {
             method: 'POST',
-            headers: getAuthHeaders(),
-            body: JSON.stringify(veiculoData)
+            headers: getAuthHeaders(true), // true para indicar FormData
+            body: formData
         });
         const resultado = await response.json();
         if (!response.ok) throw new Error(resultado.error || 'Erro ao salvar o veículo.');

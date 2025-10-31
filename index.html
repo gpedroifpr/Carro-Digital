@@ -174,16 +174,24 @@
             
             <div class="form-container-db">
                 <h3>Adicionar Novo Veículo</h3>
-                <form id="formAdicionarVeiculo">
+                <!-- MODIFICADO: Adicionado 'enctype' e os atributos 'name' para os inputs -->
+                <form id="formAdicionarVeiculo" enctype="multipart/form-data">
                     <div class="form-row">
-                        <input type="text" id="veiculoPlaca" placeholder="Placa (ABC1D23)" required>
-                        <input type="text" id="veiculoMarca" placeholder="Marca (Ex: Ford)" required>
-                        <input type="text" id="veiculoModelo" placeholder="Modelo (Ex: Maverick)" required>
+                        <input type="text" id="veiculoPlaca" name="placa" placeholder="Placa (ABC1D23)" required>
+                        <input type="text" id="veiculoMarca" name="marca" placeholder="Marca (Ex: Ford)" required>
+                        <input type="text" id="veiculoModelo" name="modelo" placeholder="Modelo (Ex: Maverick)" required>
                     </div>
                     <div class="form-row">
-                        <input type="number" id="veiculoAno" placeholder="Ano (Ex: 2024)" required>
-                        <input type="text" id="veiculoCor" placeholder="Cor (Opcional)">
-                        <button type="submit">Salvar Veículo</button>
+                        <input type="number" id="veiculoAno" name="ano" placeholder="Ano (Ex: 2024)" required>
+                        <input type="text" id="veiculoCor" name="cor" placeholder="Cor (Opcional)">
+                    </div>
+                    <!-- ADICIONADO: Campo para upload da imagem -->
+                    <div class="form-row" style="margin-top: 15px;">
+                        <label for="imagemVeiculo" style="flex-basis: 100%; text-align: left; margin-bottom: 5px;">Foto do Veículo (Opcional):</label>
+                        <input type="file" id="imagemVeiculo" name="imagem" accept="image/*" style="flex-basis: 100%;">
+                    </div>
+                    <div class="form-row" style="margin-top: 20px;">
+                        <button type="submit" style="width: 100%; padding: 12px; font-size: 1.1em;">Salvar Veículo</button>
                     </div>
                 </form>
                 <div id="mensagemFormVeiculo" class="mensagem" style="display: none; margin-top: 10px;"></div>

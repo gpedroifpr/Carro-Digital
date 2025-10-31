@@ -1,5 +1,3 @@
-// server.js - VERSÃO FINAL, COMPLETA E CORRIGIDA COM SINTAXE "import"
-
 // Importações de Pacotes
 import express from 'express';
 import dotenv from 'dotenv';
@@ -9,6 +7,9 @@ import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import rateLimit from 'express-rate-limit';
+import multer from 'multer'; // ADICIONADO
+import path from 'path'; // ADICIONADO
+import { fileURLToPath } from 'url'; // ADICIONADO
 
 // Importações de Arquivos Locais
 import Veiculo from './models/veiculo.js';
@@ -17,13 +18,15 @@ import User from './models/user.js';
 import authMiddleware from './middleware/auth.js';
 
 // Configuração Inicial
-dotenv.config();
+dotenv.config(); // ADICIONADO: Carrega as variáveis do .env
 const app = express();
+const __filename = fileURLToPath(import.meta.url); // ADICIONADO
+const __dirname = path.dirname(__filename); // ADICIONADO
 
 // Conexão com o Banco de Dados
-const mongoUri = process.env.MONGO_URI;
+const mongoUri = process.env.MONGO_URI; // MODIFICADO
 if (!mongoUri) {
-    console.error("ERRO CRÍTICO: MONGO_URI não definida no ambiente.");
+    console.error("ERRO CRÍTICO: MONGO_URI não definida no arquivo .env.");
     process.exit(1);
 }
 mongoose.connect(mongoUri)
@@ -33,6 +36,19 @@ mongoose.connect(mongoUri)
 // Middlewares Globais
 app.use(cors());
 app.use(express.json());
+app.use('/uploads', express.static(path.join(__dirname, 'uploads'))); // ADICIONADO: Servir imagens
+
+// ADICIONADO: Configuração do Multer
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, 'uploads/'); // Onde salvar os arquivos
+  },
+  filename: function (req, file, cb) {
+    // Cria um nome de arquivo único para evitar sobreposição
+    cb(null, Date.now() + '-' + file.originalname);
+  }
+});
+const upload = multer({ storage: storage });
 
 // Segurança: Limitador de Requisições
 const apiLimiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 200, message: { error: "Muitas requisições, tente novamente em 15 minutos." } });
@@ -71,7 +87,7 @@ app.post('/api/auth/login', async (req, res) => {
         const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) return res.status(400).json({ error: 'Credenciais inválidas.' });
         
-        const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+        const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' }); // MODIFICADO
         
         res.status(200).json({ message: `Login bem-sucedido! Bem-vindo(a) de volta, ${user.email}.`, token, userId: user._id, email: user.email });
     } catch (error) {
@@ -102,9 +118,22 @@ app.get('/api/veiculos', authMiddleware, async (req, res) => {
     }
 });
 
-app.post('/api/veiculos', authMiddleware, createLimiter, async (req, res) => {
+// MODIFICADO: Rota de criação de veículo para aceitar upload de imagem
+app.post('/api/veiculos', authMiddleware, createLimiter, upload.single('imagem'), async (req, res) => {
     try {
-        const novoVeiculoData = { ...req.body, owner: req.userId };
+        const { placa, marca, modelo, ano, cor } = req.body;
+        const imageUrl = req.file ? req.file.path.replace(/\\/g, "/") : null; // Pega o caminho do arquivo
+
+        const novoVeiculoData = {
+            placa,
+            marca,
+            modelo,
+            ano,
+            cor,
+            imageUrl, // Salva o caminho da imagem no banco
+            owner: req.userId
+        };
+
         const veiculoCriado = await Veiculo.create(novoVeiculoData);
         res.status(201).json(veiculoCriado);
     } catch (error) {
@@ -215,7 +244,7 @@ app.get('/api/veiculos/:veiculoId/manutencoes', authMiddleware, async (req, res)
 // =======================================================
 
 const port = process.env.PORT || 3001;
-const apiKey = process.env.OPENWEATHER_API_KEY;
+const apiKey = process.env.OPENWEATHER_API_KEY; // MODIFICADO
 
 // Dados Mock...
 const dicasManutencaoGerais = [

@@ -7,6 +7,7 @@ const veiculoSchema = new mongoose.Schema({
     modelo: { type: String, required: true },
     ano: { type: Number, required: true },
     cor: { type: String },
+    imageUrl: { type: String }, // ADICIONADO: Campo para guardar o caminho da imagem
     owner: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
     sharedWith: [{
       type: mongoose.Schema.Types.ObjectId,
